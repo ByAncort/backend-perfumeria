@@ -1,9 +1,6 @@
-package com.app.usuarios.Dto;
+package com.app.usuarios.Config.Dto;
 
 import lombok.*;
-
-import java.util.Date;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -11,7 +8,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
+public class TokenResponse {
 
     private String token;
 
