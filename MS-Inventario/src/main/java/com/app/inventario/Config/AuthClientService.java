@@ -1,4 +1,4 @@
-package com.app.usuarios.Config;
+package com.app.inventario.Config;
 
 import com.app.usuarios.Config.Dto.TokenResponse;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.app.usuarios.Config.Dto;
+package com.app.inventario.Config.Dto;
 
 import lombok.*;
 
