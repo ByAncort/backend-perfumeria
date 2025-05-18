@@ -1,24 +1,34 @@
 package com.app.ventas.Service;
 
-import com.app.ventas.Client.InventarioClient;
-import com.app.ventas.Dto.*;
-import com.app.ventas.Models.DetalleVenta;
-import com.app.ventas.Models.Venta;
-import com.app.ventas.Repository.VentaRepository;
-import jakarta.transaction.Transactional;
+import com.app.ventas.Dto.ProveedorResponse;
+import com.app.ventas.shared.MicroserviceClient;
+import com.app.ventas.shared.TokenContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class VentaService {
 
-    private final VentaRepository ventaRepository;
-    private final InventarioClient inventarioClient;
+    private final MicroserviceClient microserviceClient;
 
+    public ProveedorResponse consultarProveedor(Long proveedorId) {
+        String token = TokenContext.getToken();
+        String url = "http://localhost:9012/api/ms-inventario/proveedor/" + proveedorId;
+        ResponseEntity<ProveedorResponse> response = microserviceClient.enviarConToken(
+                url,
+                HttpMethod.GET,
+                null,
+                ProveedorResponse.class,
+                token
+        );
 
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Error al obtener proveedor");
+        }
+
+        return response.getBody();
+    }
 }

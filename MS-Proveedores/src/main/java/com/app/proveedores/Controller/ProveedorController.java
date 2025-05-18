@@ -1,9 +1,9 @@
 package com.app.proveedores.Controller;
 
 import com.app.proveedores.Dto.ProveedorDto;
-import com.app.proveedores.Models.ServiceResult;
+import com.app.proveedores.Dto.ServiceResult;
+import com.app.proveedores.Models.Proveedor;
 import com.app.proveedores.Service.ProveedorService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,57 +12,63 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/proveedores")
+@RequestMapping("/api/ms-inventario/proveedor/")
 @RequiredArgsConstructor
 public class ProveedorController {
-
     private final ProveedorService proveedorService;
 
-    @GetMapping
-    public ResponseEntity<?> listarProveedores() {
-        ServiceResult<List<ProveedorDto>> result = proveedorService.listarTodos();
-        return ResponseEntity.ok(result.getData());
+    @PostMapping("create-proveedor")
+    public ResponseEntity<?> createProveedor(@RequestBody ProveedorDto proveedorDto) {
+        ServiceResult<Proveedor> result = proveedorService.addProveedor(proveedorDto);
+        return handleServiceResult(result, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerProveedor(@PathVariable Long id) {
-        ServiceResult<ProveedorDto> result = proveedorService.buscarPorId(id);
-        return handleServiceResult(result);
+    @GetMapping("all-active")
+    public ResponseEntity<?> getAllProveedoresActivos() {
+        ServiceResult<List<Proveedor>> result = proveedorService.getAllProveedoresActivos();
+        return handleServiceResult(result, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<?> crearProveedor(@Valid @RequestBody ProveedorDto proveedorDto) {
-        ServiceResult<ProveedorDto> result = proveedorService.crearProveedor(proveedorDto);
-        return result.hasErrors() ?
-                ResponseEntity.badRequest().body(result.getErrors()) :
-                ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
+    @GetMapping("{id}")
+    public ResponseEntity<?> getProveedorById(@PathVariable Long id) {
+        ServiceResult<Proveedor> result = proveedorService.getProveedorById(id);
+        return handleServiceResult(result, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarProveedor(
+    @PutMapping("update/{id}")
+    public ResponseEntity<?> updateProveedor(
             @PathVariable Long id,
-            @Valid @RequestBody ProveedorDto proveedorDto) {
-        ServiceResult<ProveedorDto> result = proveedorService.actualizarProveedor(id, proveedorDto);
-        return handleServiceResult(result);
+            @RequestBody ProveedorDto dto
+    ) {
+        ServiceResult<Proveedor> result = proveedorService.updateProveedor(id, dto);
+        return handleServiceResult(result, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarProveedor(@PathVariable Long id) {
-        ServiceResult<String> result = proveedorService.eliminarProveedor(id);
-        return result.hasErrors() ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(result.getErrors()) :
-                ResponseEntity.noContent().build();
+    @PatchMapping("toggle-activo/{id}")
+    public ResponseEntity<?> toggleActivoProveedor(
+            @PathVariable Long id,
+            @RequestParam boolean activo
+    ) {
+        ServiceResult<Proveedor> result = proveedorService.toggleActivoProveedor(id, activo);
+        return handleServiceResult(result, HttpStatus.OK);
     }
 
-//    @PostMapping("/buscar-por-ids")
-//    public ResponseEntity<?> buscarProveedoresPorIds(@RequestBody List<Long> ids) {
-//        ServiceResult<List<ProveedorDto>> result = proveedorService.buscarPorIds(ids);
-//        return ResponseEntity.ok(result.getData());
-//    }
+    @GetMapping("by-rut/{rut}")
+    public ResponseEntity<?> getProveedorByRut(@PathVariable String rut) {
+        ServiceResult<Proveedor> result = proveedorService.getProveedorByRut(rut);
+        return handleServiceResult(result, HttpStatus.OK);
+    }
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> getProveedorByRut(@PathVariable Long id) {
+        ServiceResult<Proveedor> result = proveedorService.deleteProveedor(id);
+        return handleServiceResult(result, HttpStatus.OK);
+    }
 
-    private ResponseEntity<?> handleServiceResult(ServiceResult<?> result) {
-        return result.hasErrors() ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(result.getErrors()) :
-                ResponseEntity.ok(result.getData());
+    private ResponseEntity<?> handleServiceResult(ServiceResult<?> result, HttpStatus successStatus) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        } else {
+            return ResponseEntity.status(successStatus).body(result.getData());
+        }
     }
 }

@@ -1,8 +1,5 @@
 server:
-  port: 9011
-inventario:
-  service:
-    url:http://localhost:9012
+  port: 9013
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/perfumalandia_spa?allowPublicKeyRetrieval=true&useSSL=false

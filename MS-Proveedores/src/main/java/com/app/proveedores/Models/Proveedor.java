@@ -1,9 +1,12 @@
 package com.app.proveedores.Models;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name = "proveedores")
@@ -14,30 +17,25 @@ import java.time.LocalDateTime;
 public class Proveedor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "proveedor_id")
+    @Column(name = "id_proveedor")
     private Long id;
-
-    @Column(nullable = false, unique = true, length = 20)
-    private String ruc;
 
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Column(unique = true, length = 12)
+    private String rut;
+
     private String direccion;
-
-    @Column(length = 50)
-    private String contactoPrincipal;
-
-    @Column(length = 20)
     private String telefono;
-
-    @Column(length = 100)
     private String email;
 
     @Builder.Default
     private Boolean activo = true;
 
-    @Column(name = "fecha_registro")
-    @Builder.Default
-    private LocalDateTime fechaRegistro = LocalDateTime.now();
+    public boolean isActivo() {
+        return activo != null ? activo : false;
+    }
+
 }
+

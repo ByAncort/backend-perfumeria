@@ -1,16 +1,18 @@
 package com.app.proveedores.Dto;
 
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProveedorDto {
-    private Long id;
-    private String ruc;
     private String nombre;
+    private String rut;
     private String direccion;
-    private String contactoPrincipal;
     private String telefono;
     private String email;
     private boolean activo;
