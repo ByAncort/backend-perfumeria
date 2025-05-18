@@ -196,4 +196,43 @@ public class InventarioService {
                 .ultimaActualizacion(inventario.getUltimaActualizacion())
                 .build();
     }
+    @Transactional
+    public InventarioResponse vender(Long inventarioId) {
+        Inventario inventario = inventarioRepository.findById(inventarioId)
+                .orElseThrow(() -> new RuntimeException("Registro de inventario no encontrado"));
+
+        if (inventario.getCantidad() <= 0) {
+            throw new RuntimeException("No hay stock disponible para vender");
+        }
+
+        inventario.setCantidad(inventario.getCantidad() - 1);
+        inventario.setUltimaActualizacion(LocalDateTime.now());
+
+        inventario = inventarioRepository.save(inventario);
+
+        ProductoResponse producto = consultarProducto(inventario.getProductoId());
+        SucursalResponse sucursal = consultarSucursal(inventario.getSucursalId());
+
+        return buildInventarioResponse(inventario, producto, sucursal);
+    }
+    @Transactional
+    public InventarioResponse canerlarVenta(Long inventarioId) {
+        Inventario inventario = inventarioRepository.findById(inventarioId)
+                .orElseThrow(() -> new RuntimeException("Registro de inventario no encontrado"));
+
+        if (inventario.getCantidad() <= 0) {
+            throw new RuntimeException("No hay stock disponible para vender");
+        }
+
+        inventario.setCantidad(inventario.getCantidad() + 1);
+        inventario.setUltimaActualizacion(LocalDateTime.now());
+
+        inventario = inventarioRepository.save(inventario);
+
+        ProductoResponse producto = consultarProducto(inventario.getProductoId());
+        SucursalResponse sucursal = consultarSucursal(inventario.getSucursalId());
+
+        return buildInventarioResponse(inventario, producto, sucursal);
+    }
+
 }

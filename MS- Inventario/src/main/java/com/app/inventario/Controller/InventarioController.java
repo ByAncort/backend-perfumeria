@@ -52,4 +52,14 @@ public class InventarioController {
     public ResponseEntity<List<InventarioResponse>> obtenerProductosBajoStock() {
         return ResponseEntity.ok(inventarioService.obtenerProductosBajoStockMinimo());
     }
+    @PostMapping("/{id}/vender")
+    public ResponseEntity<InventarioResponse> vender(@PathVariable Long id) {
+        InventarioResponse response = inventarioService.vender(id);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/{id}/cancelar-venta")
+    public ResponseEntity<InventarioResponse> cancelarventa(@PathVariable Long id) {
+        InventarioResponse response = inventarioService.canerlarVenta(id);
+        return ResponseEntity.ok(response);
+    }
 }
