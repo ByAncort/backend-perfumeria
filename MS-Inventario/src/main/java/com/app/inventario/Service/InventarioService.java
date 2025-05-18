@@ -15,6 +15,50 @@ public class InventarioService {
     private final InventarioRepository inventarioRepository;
     private final ProductoRepository productoRepository;
     private final SucursalRepository sucursalRepository;
+    public ServiceResult<InventarioResponseDto> crearInventario(Long productoId, Long sucursalId, Integer cantidad) {
+        List<String> errors = new ArrayList<>();
+
+        try {
+            if (cantidad == null || cantidad < 0) {
+                errors.add("La cantidad debe ser mayor o igual a 0");
+                return new ServiceResult<>(errors);
+            }
+
+            Producto producto = productoRepository.findById(productoId)
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+            Sucursal sucursal = sucursalRepository.findById(sucursalId)
+                    .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+
+            Optional<Inventario> existente = inventarioRepository.findByProductoAndSucursal(producto, sucursal);
+            if (existente.isPresent()) {
+                errors.add("Ya existe un registro de inventario para este producto y sucursal");
+                return new ServiceResult<>(errors);
+            }
+
+            Inventario inventario = new Inventario();
+            inventario.setProducto(producto);
+            inventario.setSucursal(sucursal);
+            inventario.setCantidad(cantidad);
+            inventario.setUltimaActualizacion(LocalDateTime.now());
+
+            Inventario inventarioGuardado = inventarioRepository.save(inventario);
+
+            InventarioResponseDto responseDto = InventarioResponseDto.fromEntity(inventarioGuardado);
+
+            return new ServiceResult<>(responseDto);
+
+        } catch (RuntimeException e) {
+            errors.add(e.getMessage());
+            return new ServiceResult<>(errors);
+        } catch (Exception e) {
+            errors.add("Error al crear inventario: " + e.getMessage());
+            return new ServiceResult<>(errors);
+        }
+    }
+
+
+
 
     public ServiceResult<Inventario> actualizarStock(Long productoId, Long sucursalId, Integer cantidad) {
         List<String> errors = new ArrayList<>();
@@ -42,14 +86,21 @@ public class InventarioService {
         }
     }
 
-    public ServiceResult<List<Inventario>> obtenerProductosBajoStock() {
+    public ServiceResult<List<InventarioResponseDto>> obtenerProductosBajoStock() {
         try {
             List<Inventario> bajoStock = inventarioRepository.findProductosBajoStock();
-            return new ServiceResult<>(bajoStock);
+
+            // Mapear cada Inventario a InventarioResponseDto
+            List<InventarioResponseDto> dtos = bajoStock.stream()
+                    .map(InventarioResponseDto::fromEntity)
+                    .toList();
+
+            return new ServiceResult<>(dtos);
         } catch (Exception e) {
             return new ServiceResult<>(List.of("Error al obtener productos bajo stock: " + e.getMessage()));
         }
     }
+
 
     public ServiceResult<Inventario> transferirStock(Long productoId, Long origenId, Long destinoId, Integer cantidad) {
         List<String> errors = new ArrayList<>();

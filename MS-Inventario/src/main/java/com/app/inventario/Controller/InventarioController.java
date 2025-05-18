@@ -1,5 +1,6 @@
 package com.app.inventario.Controller;
 
+import com.app.inventario.Dto.InventarioResponseDto;
 import com.app.inventario.Dto.ServiceResult;
 import com.app.inventario.Models.Inventario;
 import com.app.inventario.Service.InventarioService;
@@ -29,7 +30,7 @@ public class InventarioController {
 
     @GetMapping("/bajo-stock")
     public ResponseEntity<?> obtenerProductosBajoStock() {
-        ServiceResult<List<Inventario>> result = inventarioService.obtenerProductosBajoStock();
+        ServiceResult<List<InventarioResponseDto>> result = inventarioService.obtenerProductosBajoStock();
         return handleResult(result, HttpStatus.OK);
     }
 
@@ -55,7 +56,14 @@ public class InventarioController {
                 .ajustarStock(productoId, sucursalId, ajuste);
         return handleResult(result, HttpStatus.OK);
     }
-
+    @PostMapping("/crear")
+    public ResponseEntity<?> crearInventario(
+            @RequestParam Long productoId,
+            @RequestParam Long sucursalId,
+            @RequestParam Integer cantidad) {
+        ServiceResult<InventarioResponseDto> result = inventarioService.crearInventario(productoId, sucursalId, cantidad);
+        return handleResult(result,HttpStatus.OK);
+    }
     @GetMapping("/producto/{productoId}")
     public ResponseEntity<?> obtenerStockPorProducto(@PathVariable Long productoId) {
         ServiceResult<List<Inventario>> result = inventarioService
@@ -70,11 +78,12 @@ public class InventarioController {
         return handleResult(result, HttpStatus.OK);
     }
 
-    // Método helper para manejar todas las respuestas
     private ResponseEntity<?> handleResult(ServiceResult<?> result, HttpStatus successStatus) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
         return ResponseEntity.status(successStatus).body(result.getData());
     }
+
+
 }

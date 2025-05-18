@@ -1,8 +1,6 @@
 package com.app.inventario.Repository;
 
 import com.app.inventario.Models.Inventario;
-import com.app.inventario.Models.Producto;
-import com.app.inventario.Models.Sucursal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
