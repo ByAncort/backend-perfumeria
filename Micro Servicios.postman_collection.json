@@ -1,0 +1,1749 @@
+{
+	"info": {
+		"_postman_id": "9b9c86b0-fc4a-4573-b0f3-b356d84194c8",
+		"name": "Micro Servicios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36607128"
+	},
+	"item": [
+		{
+			"name": "MS-Auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9010/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9010",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"admin\",\r\n  \"email\": \"admin@admin\",\r\n  \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9010/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9010",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "validate-token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJleHBpcmF0aW9uIjoxNzQ3NjA3NDcyNDgyLCJpc3N1ZWRBdCI6MTc0NzUxMTA3MjQ4Miwic3ViIjoiYWRtaW4iLCJpYXQiOjE3NDc1MTEwNzIsImV4cCI6MTc0NzYwNzQ3Mn0.dv6q9rz-oeL_WFDThKcto2lG5EpaXL_YmW-rqIudTMc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9010/api/auth/validate-token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9010",
+							"path": [
+								"api",
+								"auth",
+								"validate-token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MS-Usuario",
+			"item": [
+				{
+					"name": "Crear Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"KLK_ROLE\",\r\n  \"permissions\": [\r\n    {\r\n      \"name\": \"READ_PERMISSIONS\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9011/api/roles/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9011",
+							"path": [
+								"api",
+								"roles",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"KLK_ROLE\",\r\n  \"permissions\": [\r\n    {\r\n      \"name\": \"READ_PERMISSIONS\"\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9011/api/roles/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9011",
+									"path": [
+										"api",
+										"roles",
+										"create"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 17 May 2025 21:45:35 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 5,\n    \"name\": \"KLK_ROLE\",\n    \"permissions\": [\n        {\n            \"id\": 1,\n            \"name\": \"READ_PERMISSIONS\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Listar Roles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9011/api/roles/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9011",
+							"path": [
+								"api",
+								"roles",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9011/api/roles/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9011",
+									"path": [
+										"api",
+										"roles",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 17 May 2025 21:50:21 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"name\": \"ROLE_USER\",\n        \"permissions\": []\n    },\n    {\n        \"id\": 2,\n        \"name\": \"ROLE_MODERATOR\",\n        \"permissions\": []\n    },\n    {\n        \"id\": 3,\n        \"name\": \"ROLE_ADMIN\",\n        \"permissions\": []\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Eliminar Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9011/api/roles/delete-role/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9011",
+							"path": [
+								"api",
+								"roles",
+								"delete-role",
+								"5"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9011/api/roles/delete-role/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9011",
+									"path": [
+										"api",
+										"roles",
+										"delete-role",
+										"5"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/plain;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "26"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 17 May 2025 21:47:15 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "Role deleted successfully."
+						}
+					]
+				},
+				{
+					"name": "Asignar permiso",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9011/api/roles/ROLE_USER/assign-permission/READ_PERMISSIONS",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9011",
+							"path": [
+								"api",
+								"roles",
+								"ROLE_USER",
+								"assign-permission",
+								"READ_PERMISSIONS"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Asignar permiso",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9011/api/roles/ROLE_USER/assign-permission/READ_PERMISSIONS",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9011",
+									"path": [
+										"api",
+										"roles",
+										"ROLE_USER",
+										"assign-permission",
+										"READ_PERMISSIONS"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 17 May 2025 21:54:47 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"name\": \"ROLE_USER\",\n    \"permissions\": [\n        {\n            \"id\": 1,\n            \"name\": \"READ_PERMISSIONS\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Permiso",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9011/api/roles/ROLE_USER/remove-permission/READ_PERMISSIONS",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9011",
+							"path": [
+								"api",
+								"roles",
+								"ROLE_USER",
+								"remove-permission",
+								"READ_PERMISSIONS"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9011/api/roles/ROLE_USER/remove-permission/READ_PERMISSIONS",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9011",
+									"path": [
+										"api",
+										"roles",
+										"ROLE_USER",
+										"remove-permission",
+										"READ_PERMISSIONS"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 17 May 2025 21:56:27 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"name\": \"ROLE_USER\",\n    \"permissions\": []\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "MS-proveedor",
+			"item": [
+				{
+					"name": "actuilizar por id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"string\",\r\n  \"rut\": \"string\",\r\n  \"direccion\": \"string\",\r\n  \"telefono\": \"string\",\r\n  \"email\": \"string\",\r\n  \"activo\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear proveedor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"string\",\r\n  \"rut\": \"string\",\r\n  \"direccion\": \"string\",\r\n  \"telefono\": \"string\",\r\n  \"email\": \"string\",\r\n  \"activo\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/create-proveedor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"create-proveedor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cambiar estado",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"string\",\r\n  \"rut\": \"string\",\r\n  \"direccion\": \"string\",\r\n  \"telefono\": \"string\",\r\n  \"email\": \"string\",\r\n  \"activo\": true\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/toggle-activo/1?activo=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"toggle-activo",
+								"1"
+							],
+							"query": [
+								{
+									"key": "activo",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener proveedor por id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener proveedor por rut",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/by-rut/21.936.621-3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"by-rut",
+								"21.936.621-3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener todos los activos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/all-active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"all-active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete proveedor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9014/api/ms-inventario/proveedor/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"ms-inventario",
+								"proveedor",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MS-Productos",
+			"item": [
+				{
+					"name": "create producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"codigoSku\": \"SKU‑123\",\r\n        \"nombre\": \"Teclado mecánico\",\r\n        \"descripcion\": \"RGB, switches brown\",\r\n        \"precio\": 39990,\r\n        \"costo\": 25000,\r\n        \"catalogo\": \"PERIFERICOS\",\r\n        \"serial\": \"SN‑ABC‑001\",\r\n        \"stock\": 50,\r\n        \"categoriaId\": 3,\r\n        \"proveedorId\": 1\r\n      }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9015/api/productos/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"api",
+								"productos",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar productos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9015/api/productos/list",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"api",
+								"productos",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener producto por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9015/api/productos/get/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"api",
+								"productos",
+								"get",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"codigoSku\": \"SKU‑123\",\r\n        \"nombre\": \"Teclado mecánico v2\",\r\n        \"descripcion\": \"RGB completo, switches red\",\r\n        \"precio\": 42990,\r\n        \"costo\": 26000,\r\n        \"catalogo\": \"PERIFERICOS\",\r\n        \"serial\": \"SN‑ABC‑001\",\r\n        \"stock\": 60,\r\n        \"categoriaId\": 3,\r\n        \"proveedorId\": 1\r\n      }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9015/api/productos/update/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"api",
+								"productos",
+								"update",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9015/api/productos/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"api",
+								"productos",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MS-Sucursal",
+			"item": [
+				{
+					"name": "Crear Sucursal",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Sucursal Centro\",\r\n  \"direccion\": \"Av. Principal 123\",\r\n  \"ciudad\": \"Santiago\",\r\n  \"telefono\": \"+56912345678\",\r\n  \"horarioApertura\": \"08:00:00\",\r\n  \"horarioCierre\": \"20:00:00\",\r\n  \"activa\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9016/api/sucursales",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9016",
+							"path": [
+								"api",
+								"sucursales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Sucursal por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9016/api/sucursales/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9016",
+							"path": [
+								"api",
+								"sucursales",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todas las Sucursales",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9016/api/sucursales",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9016",
+							"path": [
+								"api",
+								"sucursales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Sucursal",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Sucursal Centro Actualizada\",\r\n  \"horarioCierre\": \"21:00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9016/api/sucursales/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9016",
+							"path": [
+								"api",
+								"sucursales",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Estado de Sucursal",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9016/api/sucursales/1/estado?activa=false",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9016",
+							"path": [
+								"api",
+								"sucursales",
+								"1",
+								"estado"
+							],
+							"query": [
+								{
+									"key": "activa",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Sucursales Activas",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9016/api/sucursales/activas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9016",
+							"path": [
+								"api",
+								"sucursales",
+								"activas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MS-Inventario",
+			"item": [
+				{
+					"name": "Registrar nuevo registro de inventario",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productoId\": 1,\r\n  \"sucursalId\": 1,\r\n  \"cantidad\": 50,\r\n  \"stockMinimo\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9017/api/inventario",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener registro de inventario por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar inventario por sucursal",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/sucursal/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"sucursal",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar stock",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/1/stock?cantidad=45",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"1",
+								"stock"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "45"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transferir stock entre sucursales",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/transferencia?productoId=1&origenId=1&destinoId=2&cantidad=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"transferencia"
+							],
+							"query": [
+								{
+									"key": "productoId",
+									"value": "1"
+								},
+								{
+									"key": "origenId",
+									"value": "1"
+								},
+								{
+									"key": "destinoId",
+									"value": "2"
+								},
+								{
+									"key": "cantidad",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener productos con bajo stock",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/bajo-stock",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"bajo-stock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vender Reducir Stock",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/1/vender",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"1",
+								"vender"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CancelarVenta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9017/api/inventario/1/cancelar-venta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9017",
+							"path": [
+								"api",
+								"inventario",
+								"1",
+								"cancelar-venta"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MS-Ventas",
+			"item": [
+				{
+					"name": "Crear Venta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sucursalId\": 3,\r\n  \"clienteId\": 42,\r\n  \"detalles\": [\r\n    { \"inventarioId\": 1, \"cantidad\": 2 },\r\n    { \"inventarioId\": 1, \"cantidad\": 1 }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9013/api/ventas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9013",
+							"path": [
+								"api",
+								"ventas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Anular Venta",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9013/api/ventas/1/anular",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9013",
+							"path": [
+								"api",
+								"ventas",
+								"1",
+								"anular"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9013/api/ventas/listar-ventas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9013",
+							"path": [
+								"api",
+								"ventas",
+								"listar-ventas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener venta por id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9013/api/ventas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9013",
+							"path": [
+								"api",
+								"ventas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "URL_INVENTARIO",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "base_url",
+			"value": "http://localhost:9012",
+			"type": "default"
+		},
+		{
+			"key": "URL_PROVEEDOR",
+			"value": "http://localhost:9013",
+			"type": "default"
+		}
+	]
+}
