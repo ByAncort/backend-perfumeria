@@ -254,7 +254,7 @@ public class ProveedorService {
                 return new ServiceResult<>(errors);
             }
 
-            
+
             proveedorRepository.delete(proveedor);
             logger.info("Proveedor eliminado (inactivado) con ID: {}", id);
             return new ServiceResult<>(proveedor);
