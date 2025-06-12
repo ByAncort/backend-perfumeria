@@ -3,6 +3,13 @@ package com.app.sucursales.Controller;
 import com.app.sucursales.Dto.ServiceResult;
 import com.app.sucursales.Dto.SucursalDto;
 import com.app.sucursales.Service.SucursalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +19,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sucursales")
 @RequiredArgsConstructor
+@Tag(name = "Sucursales", description = "API para la gestión de sucursales")
 public class SucursalController {
 
     private final SucursalService sucursalService;
 
+    @Operation(
+            summary = "Crear una nueva sucursal",
+            description = "Endpoint para registrar una nueva sucursal en el sistema"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucursal creada exitosamente",
+                    content = @Content(schema = @Schema(implementation = SucursalDto.class))),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                    content = @Content(schema = @Schema(implementation = List.class)))
+    })
     @PostMapping
-    public ResponseEntity<?> crearSucursal(@RequestBody SucursalDto dto) {
+    public ResponseEntity<?> crearSucursal(
+            @Parameter(description = "Datos de la sucursal a crear", required = true)
+            @RequestBody SucursalDto dto) {
         ServiceResult<SucursalDto> result = sucursalService.crearSucursal(dto);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
@@ -25,8 +45,19 @@ public class SucursalController {
         return ResponseEntity.ok(result.getData());
     }
 
+    @Operation(
+            summary = "Obtener una sucursal por ID",
+            description = "Endpoint para recuperar los detalles de una sucursal específica"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucursal encontrada",
+                    content = @Content(schema = @Schema(implementation = SucursalDto.class))),
+            @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerSucursal(@PathVariable Long id) {
+    public ResponseEntity<?> obtenerSucursal(
+            @Parameter(description = "ID de la sucursal a buscar", required = true)
+            @PathVariable Long id) {
         ServiceResult<SucursalDto> result = sucursalService.obtenerSucursalPorId(id);
         if (result.hasErrors()) {
             return ResponseEntity.notFound().build();
@@ -34,6 +65,16 @@ public class SucursalController {
         return ResponseEntity.ok(result.getData());
     }
 
+    @Operation(
+            summary = "Listar todas las sucursales",
+            description = "Endpoint para obtener un listado completo de todas las sucursales"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de sucursales obtenido",
+                    content = @Content(schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                    content = @Content(schema = @Schema(implementation = List.class)))
+    })
     @GetMapping
     public ResponseEntity<?> listarSucursales() {
         ServiceResult<List<SucursalDto>> result = sucursalService.listarTodasLasSucursales();
@@ -43,8 +84,23 @@ public class SucursalController {
         return ResponseEntity.ok(result.getData());
     }
 
+    @Operation(
+            summary = "Actualizar una sucursal",
+            description = "Endpoint para modificar los datos de una sucursal existente"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucursal actualizada exitosamente",
+                    content = @Content(schema = @Schema(implementation = SucursalDto.class))),
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                    content = @Content(schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarSucursal(@PathVariable Long id, @RequestBody SucursalDto dto) {
+    public ResponseEntity<?> actualizarSucursal(
+            @Parameter(description = "ID de la sucursal a actualizar", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Nuevos datos de la sucursal", required = true)
+            @RequestBody SucursalDto dto) {
         ServiceResult<SucursalDto> result = sucursalService.actualizarSucursal(id, dto);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
@@ -52,8 +108,21 @@ public class SucursalController {
         return ResponseEntity.ok(result.getData());
     }
 
+    @Operation(
+            summary = "Cambiar estado de una sucursal",
+            description = "Endpoint para activar o desactivar una sucursal"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Estado cambiado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida",
+                    content = @Content(schema = @Schema(implementation = List.class)))
+    })
     @PatchMapping("/{id}/estado")
-    public ResponseEntity<?> cambiarEstadoSucursal(@PathVariable Long id, @RequestParam boolean activa) {
+    public ResponseEntity<?> cambiarEstadoSucursal(
+            @Parameter(description = "ID de la sucursal a modificar", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Nuevo estado de la sucursal (true=activa, false=inactiva)", required = true)
+            @RequestParam boolean activa) {
         ServiceResult<Void> result = sucursalService.cambiarEstadoSucursal(id, activa);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
@@ -61,6 +130,16 @@ public class SucursalController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Listar sucursales activas",
+            description = "Endpoint para obtener un listado de todas las sucursales activas"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de sucursales activas obtenido",
+                    content = @Content(schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                    content = @Content(schema = @Schema(implementation = List.class)))
+    })
     @GetMapping("/activas")
     public ResponseEntity<?> buscarSucursalesActivas() {
         ServiceResult<List<SucursalDto>> result = sucursalService.buscarSucursalesActivas();
@@ -70,4 +149,3 @@ public class SucursalController {
         return ResponseEntity.ok(result.getData());
     }
 }
-
