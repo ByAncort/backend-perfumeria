@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="lib-result.jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lib_result_jar</output-path>
+    <root id="root">
+      <element id="module-output" name="service-result" />
+    </root>
+  </artifact>
+</component>
