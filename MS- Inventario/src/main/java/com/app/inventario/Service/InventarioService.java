@@ -6,6 +6,7 @@ import com.app.inventario.Repository.InventarioRepository;
 import com.app.inventario.shared.MicroserviceClient;
 import com.app.inventario.shared.TokenContext;
 import lombok.RequiredArgsConstructor;
+import org.app.dto.ServiceResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class InventarioService {
     private final MicroserviceClient microserviceClient;
     private final InventarioRepository inventarioRepository;
 
-    // Métodos existentes
+
     public SucursalResponse consultarSucursal(Long id) {
         String token = TokenContext.getToken();
         String url = SUCURSAL_SERVICE_URL + "/api/sucursales/" + id;
@@ -66,11 +67,11 @@ public class InventarioService {
         return response.getBody();
     }
 
-    // Nuevos métodos para gestión de inventario
+
 
     @Transactional
     public InventarioResponse registrarInventario(InventarioRequest request) {
-        // Validar existencia de producto y sucursal
+
         ProductoResponse producto = consultarProducto(request.getProductoId());
         SucursalResponse sucursal = consultarSucursal(request.getSucursalId());
 
@@ -96,7 +97,7 @@ public class InventarioService {
     }
 
     public List<InventarioResponse> obtenerInventarioPorSucursal(Long sucursalId) {
-        // Validar que la sucursal existe
+
         consultarSucursal(sucursalId);
 
         return inventarioRepository.findBySucursalId(sucursalId).stream()
@@ -125,21 +126,21 @@ public class InventarioService {
 
     @Transactional
     public InventarioResponse transferirStock(Long origenId, Long destinoId, Long productoId, Integer cantidad) {
-        // Validar sucursales y producto
+
         consultarSucursal(origenId);
         consultarSucursal(destinoId);
         consultarProducto(productoId);
 
-        // Obtener inventario origen
+
         Inventario inventarioOrigen = inventarioRepository.findByProductoIdAndSucursalId(productoId, origenId)
                 .orElseThrow(() -> new RuntimeException("No existe inventario para el producto en la sucursal origen"));
 
-        // Verificar stock suficiente
+
         if (inventarioOrigen.getCantidad() < cantidad) {
             throw new RuntimeException("Stock insuficiente en sucursal origen");
         }
 
-        // Obtener o crear inventario destino
+
         Inventario inventarioDestino = inventarioRepository.findByProductoIdAndSucursalId(productoId, destinoId)
                 .orElse(Inventario.builder()
                         .productoId(productoId)
@@ -148,14 +149,14 @@ public class InventarioService {
                         .stockMinimo(1)
                         .build());
 
-        // Actualizar stocks
+
         inventarioOrigen.setCantidad(inventarioOrigen.getCantidad() - cantidad);
         inventarioDestino.setCantidad(inventarioDestino.getCantidad() + cantidad);
 
         inventarioRepository.save(inventarioOrigen);
         inventarioRepository.save(inventarioDestino);
 
-        // Obtener datos completos para la respuesta
+
         ProductoResponse producto = consultarProducto(productoId);
         SucursalResponse sucursalOrigen = consultarSucursal(origenId);
         SucursalResponse sucursalDestino = consultarSucursal(destinoId);
@@ -196,25 +197,63 @@ public class InventarioService {
                 .ultimaActualizacion(inventario.getUltimaActualizacion())
                 .build();
     }
+//    @Transactional
+//    public InventarioResponse vender(Long inventarioId) {
+//        Inventario inventario = inventarioRepository.findById(inventarioId)
+//                .orElseThrow(() -> new RuntimeException("Registro de inventario no encontrado"));
+//
+//        if (inventario.getCantidad() <= 0) {
+//            throw new RuntimeException("No hay stock disponible para vender");
+//        }
+//
+//        inventario.setCantidad(inventario.getCantidad() - 1);
+//        inventario.setUltimaActualizacion(LocalDateTime.now());
+//
+//        inventario = inventarioRepository.save(inventario);
+//
+//        ProductoResponse producto = consultarProducto(inventario.getProductoId());
+//        SucursalResponse sucursal = consultarSucursal(inventario.getSucursalId());
+//
+//        return buildInventarioResponse(inventario, producto, sucursal);
+//    }
+
     @Transactional
-    public InventarioResponse vender(Long inventarioId) {
-        Inventario inventario = inventarioRepository.findById(inventarioId)
-                .orElseThrow(() -> new RuntimeException("Registro de inventario no encontrado"));
+    public ServiceResult<InventarioResponse> vender(Long inventarioId) {
+        try {
+            Inventario inventario = inventarioRepository.findById(inventarioId)
+                    .orElseThrow(() -> new RuntimeException("Inventario no encontrado"));
 
-        if (inventario.getCantidad() <= 0) {
-            throw new RuntimeException("No hay stock disponible para vender");
+            if (inventario.getCantidad() <= 0) {
+                return new ServiceResult<>(List.of("Sin stock disponible"));
+            }
+
+            // Paso 1: reservar stock
+            inventario.setCantidad(inventario.getCantidad() - 1);
+            inventario.setUltimaActualizacion(LocalDateTime.now());
+            inventario = inventarioRepository.save(inventario);
+
+            // Paso 2: Validar entidades externas
+            ProductoResponse producto = consultarProducto(inventario.getProductoId());
+            SucursalResponse sucursal = consultarSucursal(inventario.getSucursalId());
+
+            // Paso 3: Confirmar venta
+            InventarioResponse response = buildInventarioResponse(inventario, producto, sucursal);
+            return new ServiceResult<>(response);
+
+        } catch (Exception e) {
+            // Acción compensatoria (rollback local)
+            restaurarStock(inventarioId);
+            return new ServiceResult<>(List.of("Error al procesar venta: " + e.getMessage()));
         }
-
-        inventario.setCantidad(inventario.getCantidad() - 1);
-        inventario.setUltimaActualizacion(LocalDateTime.now());
-
-        inventario = inventarioRepository.save(inventario);
-
-        ProductoResponse producto = consultarProducto(inventario.getProductoId());
-        SucursalResponse sucursal = consultarSucursal(inventario.getSucursalId());
-
-        return buildInventarioResponse(inventario, producto, sucursal);
     }
+
+    private void restaurarStock(Long inventarioId) {
+        inventarioRepository.findById(inventarioId).ifPresent(inv -> {
+            inv.setCantidad(inv.getCantidad() + 1);
+            inventarioRepository.save(inv);
+        });
+    }
+
     @Transactional
     public InventarioResponse canerlarVenta(Long inventarioId) {
         Inventario inventario = inventarioRepository.findById(inventarioId)

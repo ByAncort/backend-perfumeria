@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.app.dto.ServiceResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -165,11 +166,15 @@ public class InventarioController {
                     content = @Content)
     })
     @PostMapping("/{id}/vender")
-    public ResponseEntity<InventarioResponse> vender(
+    public ResponseEntity<?> vender(
             @Parameter(description = "ID del registro de inventario", required = true)
             @PathVariable Long id) {
-        InventarioResponse response = inventarioService.vender(id);
-        return ResponseEntity.ok(response);
+        ServiceResult<InventarioResponse> response = inventarioService.vender(id);
+        if (response.hasErrors()) {
+            return ResponseEntity.badRequest().body(response.getErrors());
+        }
+
+        return ResponseEntity.ok(response.getData());
     }
 
     @Operation(

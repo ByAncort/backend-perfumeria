@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class VentaRequest {
+public class CarroRequest {
 
     private Long sucursalId;
     private Long clienteId;

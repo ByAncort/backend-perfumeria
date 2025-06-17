@@ -1,12 +1,13 @@
 package com.app.ventas.Service;
 
 import com.app.ventas.Dto.*;
-import com.app.ventas.Models.Venta;
-import com.app.ventas.Models.DetalleVenta;
-import com.app.ventas.Repository.VentaRepository;
+import com.app.ventas.Models.Carro;
+import com.app.ventas.Models.DetalleCarro;
+import com.app.ventas.Repository.CarroRepository;
 import com.app.ventas.shared.MicroserviceClient;
 import com.app.ventas.shared.TokenContext;
 import lombok.RequiredArgsConstructor;
+import org.app.dto.ServiceResult;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class VentaService {
+public class CarroService {
 
-    private final VentaRepository ventaRepository;
+    private final CarroRepository ventaRepository;
     private final MicroserviceClient microserviceClient;
 
     // Métodos existentes
@@ -81,14 +82,14 @@ public class VentaService {
     // Nuevos métodos CRUD
 
     @Transactional
-    public ServiceResult<VentaResponse> crearVenta(VentaRequest request) {
+    public ServiceResult<CarroResponse> crearVenta(CarroRequest request) {
 
         List<String> errors = new ArrayList<>();
-        List<DetalleVenta> detallesEntidad = new ArrayList<>();
+        List<DetalleCarro> detallesEntidad = new ArrayList<>();
         double totalVenta = 0.0;
 
         // 1. Validar y procesar cada detalle
-        for (VentaRequest.DetalleVentaRequest dvReq : request.getDetalles()) {
+        for (CarroRequest.DetalleVentaRequest dvReq : request.getDetalles()) {
 
             InventarioDto inventario = null;
             try {
@@ -124,7 +125,7 @@ public class VentaService {
             totalVenta += subtotal;
 
             // Construir detalle entidad
-            DetalleVenta detalle = DetalleVenta.builder()
+            DetalleCarro detalle = DetalleCarro.builder()
                     .productoId(inventario.getProducto().getId())
                     .cantidad(dvReq.getCantidad())
                     .precioUnitario(precioUnitario)
@@ -140,7 +141,7 @@ public class VentaService {
         }
 
         // 2. Construir y guardar la venta
-        Venta venta = Venta.builder()
+        Carro venta = Carro.builder()
                 .sucursalId(request.getSucursalId())
                 .clienteId(request.getClienteId())
                 .fechaVenta(LocalDateTime.now())
@@ -151,7 +152,7 @@ public class VentaService {
 
         detallesEntidad.forEach(d -> d.setVenta(venta));
 
-        Venta ventaGuardada;
+        Carro ventaGuardada;
         try {
             ventaGuardada = ventaRepository.save(venta);
         } catch (Exception ex) {
@@ -160,8 +161,8 @@ public class VentaService {
         }
 
         // 3. Construir DTO de respuesta
-        List<VentaResponse.DetalleResponse> detalleResponses = ventaGuardada.getDetalles().stream()
-                .map(d -> VentaResponse.DetalleResponse.builder()
+        List<CarroResponse.DetalleResponse> detalleResponses = ventaGuardada.getDetalles().stream()
+                .map(d -> CarroResponse.DetalleResponse.builder()
                         .productoId(d.getProductoId())
                         .cantidad(d.getCantidad())
                         .precioUnitario(d.getPrecioUnitario())
@@ -169,7 +170,7 @@ public class VentaService {
                         .build())
                 .collect(Collectors.toList());
 
-        VentaResponse response = VentaResponse.builder()
+        CarroResponse response = CarroResponse.builder()
                 .ventaId(ventaGuardada.getId())
                 .clienteId(ventaGuardada.getClienteId())
                 .sucursalId(ventaGuardada.getSucursalId())
@@ -188,7 +189,7 @@ public class VentaService {
 
         List<String> errors = new ArrayList<>();
 
-        Venta venta = ventaRepository.findById(ventaId).orElse(null);
+        Carro venta = ventaRepository.findById(ventaId).orElse(null);
         if (venta == null) {
             errors.add("La venta " + ventaId + " no existe");
             return new ServiceResult<>(errors);
@@ -199,7 +200,7 @@ public class VentaService {
             return new ServiceResult<>(errors);
         }
 
-        for (DetalleVenta det : venta.getDetalles()) {
+        for (DetalleCarro det : venta.getDetalles()) {
             try {
                 cancelarVenta(det.getProductoId());
             } catch (Exception ex) {
@@ -223,10 +224,10 @@ public class VentaService {
         return new ServiceResult<>((Void) null);
     }
     @Transactional(readOnly = true)
-    public ServiceResult<List<VentaResponse>> listarVentas() {
+    public ServiceResult<List<CarroResponse>> listarVentas() {
 
-        List<VentaResponse> respuestas = ventaRepository.findAll().stream()
-                .map(v -> VentaResponse.builder()
+        List<CarroResponse> respuestas = ventaRepository.findAll().stream()
+                .map(v -> CarroResponse.builder()
                         .ventaId(v.getId())
                         .sucursalId(v.getSucursalId())
                         .clienteId(v.getClienteId())
@@ -234,7 +235,7 @@ public class VentaService {
                         .total(v.getTotal())
                         .detalles(
                                 v.getDetalles().stream()
-                                        .map(d -> VentaResponse.DetalleResponse.builder()
+                                        .map(d -> CarroResponse.DetalleResponse.builder()
                                                 .productoId(d.getProductoId())
                                                 .cantidad(d.getCantidad())
                                                 .precioUnitario(d.getPrecioUnitario())
@@ -249,10 +250,10 @@ public class VentaService {
     }
 
     @Transactional(readOnly = true)
-    public ServiceResult<VentaResponse> obtenerVentaPorId(Long ventaId) {
+    public ServiceResult<CarroResponse> obtenerVentaPorId(Long ventaId) {
         List<String> errors = new ArrayList<>();
 
-        Venta venta = ventaRepository.findById(ventaId).orElse(null);
+        Carro venta = ventaRepository.findById(ventaId).orElse(null);
 
         if (venta == null) {
             errors.add("Venta con ID " + ventaId + " no encontrada");
@@ -260,8 +261,8 @@ public class VentaService {
         }
 
         // Mapear la entidad Venta a VentaResponse
-        List<VentaResponse.DetalleResponse> detallesResponse = venta.getDetalles().stream()
-                .map(d -> VentaResponse.DetalleResponse.builder()
+        List<CarroResponse.DetalleResponse> detallesResponse = venta.getDetalles().stream()
+                .map(d -> CarroResponse.DetalleResponse.builder()
                         .productoId(d.getProductoId())
                         .cantidad(d.getCantidad())
                         .precioUnitario(d.getPrecioUnitario())
@@ -269,7 +270,7 @@ public class VentaService {
                         .build())
                 .collect(Collectors.toList());
 
-        VentaResponse response = VentaResponse.builder()
+        CarroResponse response = CarroResponse.builder()
                 .ventaId(venta.getId())
                 .clienteId(venta.getClienteId())
                 .sucursalId(venta.getSucursalId())

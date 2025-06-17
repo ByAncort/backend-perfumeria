@@ -19,7 +19,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("API de Ventas")
                         .version("1.0")
-                        .description("API para gestión de inventario de Ventas")
+                        .description("API para gestión de inventario de Carrito")
 
                         .license(new License()
                                 .name("Apache 2.0")

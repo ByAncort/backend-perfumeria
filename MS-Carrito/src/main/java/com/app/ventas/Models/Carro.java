@@ -1,6 +1,5 @@
 package com.app.ventas.Models;
 
-import com.app.ventas.Models.DetalleVenta;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Venta {
+public class Carro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,6 +34,6 @@ public class Venta {
     private String estado = "COMPLETADA";
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
-    private List<DetalleVenta> detalles;
+    private List<DetalleCarro> detalles;
 }
 

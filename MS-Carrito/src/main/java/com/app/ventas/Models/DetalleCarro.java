@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DetalleVenta {
+public class DetalleCarro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +18,7 @@ public class DetalleVenta {
     // --- Relaciones ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venta_id", nullable = false)
-    private Venta venta;        // lado inverso
+    private Carro venta;        // lado inverso
 
     // Si el catálogo de productos está en otro microservicio, solo guardamos el id
     @Column(nullable = false)

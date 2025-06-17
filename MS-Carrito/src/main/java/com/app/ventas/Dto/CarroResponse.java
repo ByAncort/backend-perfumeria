@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class VentaResponse {
+public class CarroResponse {
 
     private Long ventaId;
     private Long sucursalId;
