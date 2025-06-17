@@ -1,7 +1,6 @@
 package com.app.producto.Controller;
 
 import com.app.producto.Dto.ProductoDto;
-import com.app.producto.Dto.ServiceResult;
 import com.app.producto.Service.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.app.dto.ServiceResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

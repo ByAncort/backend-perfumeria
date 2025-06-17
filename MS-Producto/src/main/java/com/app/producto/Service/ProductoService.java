@@ -2,7 +2,6 @@ package com.app.producto.Service;
 
 import com.app.producto.Dto.ProductoDto;
 import com.app.producto.Dto.ProveedorResponse;
-import com.app.producto.Dto.ServiceResult;
 import com.app.producto.Models.Categoria;
 import com.app.producto.Models.Producto;
 import com.app.producto.Repository.CategoriaRepository;
@@ -10,12 +9,13 @@ import com.app.producto.Repository.ProductoRepository;
 import com.app.producto.shared.MicroserviceClient;
 import com.app.producto.shared.TokenContext;
 import lombok.RequiredArgsConstructor;
+import org.app.dto.ServiceResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.cache.annotation.Cacheable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +28,12 @@ public class ProductoService {
     private final CategoriaRepository categoriaRepository;
     private final ProductoRepository productoRepository;
 
+    @Cacheable("proveedores")
+    @CircuitBreaker(name = "proveedorService", fallbackMethod = "fallbackProveedor")
     public ProveedorResponse consultarProveedor(Long proveedorId) {
         String token = TokenContext.getToken();
         String url = AUTH_SERVICE_URL + "/api/ms-inventario/proveedor/" + proveedorId;
+
         ResponseEntity<ProveedorResponse> response = microserviceClient.enviarConToken(
                 url,
                 HttpMethod.GET,
@@ -44,6 +47,10 @@ public class ProductoService {
         }
 
         return response.getBody();
+    }
+    public ProveedorResponse fallbackProveedor(Long proveedorId, Throwable t) {
+        System.out.println("Fallback ejecutado para proveedor " + proveedorId + " por error: " + t.getMessage());
+        return null;
     }
 
     public ServiceResult<ProductoDto> crearProducto(ProductoDto dto) {
@@ -200,4 +207,8 @@ public class ProductoService {
                 .categoriaId(producto.getCategoria() != null ? producto.getCategoria().getId() : null)
                 .build();
     }
+
+
+
+
 }
