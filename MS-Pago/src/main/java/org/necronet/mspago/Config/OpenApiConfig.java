@@ -16,9 +16,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API de Ventas")
+                        .title("API de pagos")
                         .version("1.0")
-                        .description("API para gestión de inventario de Clientes")
+                        .description("API para gestión de inventario de Pagos")
 
                         .license(new License()
                                 .name("Apache 2.0")
