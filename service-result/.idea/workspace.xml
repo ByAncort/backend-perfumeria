@@ -5,6 +5,48 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9924159c-bda5-4361-a9ea-a1984bb5e105" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Controller/CarroController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/AuthClientService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/Dto/TokenResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/JwtAuthFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/OpenApiConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Service/ClienteService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Service/ClienteServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/controller/ClienteController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/model/Cliente.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/model/Compra.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/model/Contacto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/repository/ClienteRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/repository/CompraRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/AuthClientService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/Dto/TokenResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/JwtAuthFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/OpenApiConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/client/MicroserviceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/client/TokenContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/client/TokenFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/controller/PagoController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/dto/CarritoResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/model/EstadoPago.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/model/MetodoPago.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/model/Pago.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/repository/PagoRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/service/PagoService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/service/PagoServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Controller/VentaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/Carro.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/Carro.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/DetalleCarro.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/DetalleCarro.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Repository/CarroRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Repository/CarroRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Service/CarroService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Service/CarroService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Producto/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Producto/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -22,21 +64,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "ByAncort"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ByAncort&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ByAncort/Gestion-perfumeria.git",
-    "accountId": "0b9c51b4-91f5-412d-abb3-4b6f5d38b4b9"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ByAncort/Gestion-perfumeria.git&quot;,
+    &quot;accountId&quot;: &quot;0b9c51b4-91f5-412d-abb3-4b6f5d38b4b9&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2ycQJ6PcpP88zsVnxcRyv5ulkp0" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -50,6 +92,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "dev",
+    "last_opened_file_path": "C:/Users/diego/Desktop/MICRO SERVICIOS/service-result",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -84,6 +127,7 @@
       <option name="presentableId" value="Default" />
       <updated>1750131309129</updated>
       <workItem from="1750131310257" duration="977000" />
+      <workItem from="1750213199212" duration="653000" />
     </task>
     <servers />
   </component>

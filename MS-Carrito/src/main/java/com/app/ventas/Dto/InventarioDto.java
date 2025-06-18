@@ -1,10 +1,14 @@
 package com.app.ventas.Dto;
 
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class InventarioDto {
     private Long id;
     private ProductoDto producto;
@@ -14,8 +18,12 @@ public class InventarioDto {
     private LocalDateTime ultimaActualizacion;
     private TransferenciaDto transferencia;
 
-    @Data
-    public class ProductoDto {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ProductoDto {
         private Long id;
         private String codigoSku;
         private String nombre;
@@ -29,8 +37,12 @@ public class InventarioDto {
         private Long proveedorId;
     }
 
-    @Data
-    public class SucursalDto {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SucursalDto {
         private Long id;
         private String nombre;
         private String direccion;
@@ -41,21 +53,13 @@ public class InventarioDto {
         private Boolean activa;
     }
 
-    @Data
-    public class TransferenciaDto {
-        private com.app.ventas.Dto.SucursalDto origen;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TransferenciaDto {
+        private SucursalDto origen;
         private Integer cantidadTransferida;
     }
-
-    @Data
-    public class InventarioResponse {
-        private Long id;
-        private com.app.ventas.Dto.ProductoDto producto;
-        private Integer cantidad;
-        private Boolean success;
-        private String message;
-
-    }
-
-
 }

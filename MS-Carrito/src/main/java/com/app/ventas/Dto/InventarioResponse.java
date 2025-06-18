@@ -1,27 +1,39 @@
 package com.app.ventas.Dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class InventarioResponse {
-    private Long id;
+    private String mensaje;
+    private Long inventarioId;
+    private Integer cantidadActual;
+    private String estado;
     private ProductoResponse producto;
     private SucursalResponse sucursal;
-    private Integer cantidad;
-    private Integer stockMinimo;
-    private LocalDateTime ultimaActualizacion;
-    private TransferenciaResponse transferencia;  // Puede ser null
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ProductoResponse {
+        private Long id;
+        private String nombre;
+        private Double precio;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SucursalResponse {
+        private Long id;
+        private String nombre;
+    }
 }
-
-
-
-
-

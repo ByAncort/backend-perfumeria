@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/carrito")
+@RequestMapping("/api/carrito/")
 @RequiredArgsConstructor
 @Tag(name = "Gestión de Carrito", description = "API para el manejo del carrito de compras")
 public class CarroController {
@@ -43,7 +43,7 @@ public class CarroController {
                     content = @Content(schema = @Schema(implementation = ServiceResult.class))
             )
     })
-    @PostMapping
+    @PostMapping("agregar-productos")
     public ResponseEntity<?> agregarProductos(
             @Parameter(description = "Datos de los productos a agregar", required = true)
             @Valid @RequestBody CarroRequest request) {
@@ -118,7 +118,7 @@ public class CarroController {
                     description = "Carrito no encontrado"
             )
     })
-    @GetMapping("/{carroId}")
+    @GetMapping("/obtener-carrito/{carroId}")
     public ResponseEntity<?> obtenerCarrito(
             @Parameter(description = "ID del carrito", required = true)
             @PathVariable Long carroId) {

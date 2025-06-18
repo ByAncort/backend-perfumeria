@@ -1,18 +1,33 @@
 package com.app.ventas.Dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CarroRequest {
+    @NotNull(message = "El ID de usuario es obligatorio")
+    private Long usuarioId;
 
-    private Long sucursalId;
-    private Long clienteId;
-    private List<DetalleVentaRequest> detalles;
+    @NotNull(message = "La lista de detalles no puede ser nula")
+    private List<DetalleCarroRequest> detalles;
 
-    @Data
-    public static class DetalleVentaRequest {
-        private Long inventarioId; // id del registro de inventario contra el que se vende
-        private Integer cantidad;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DetalleCarroRequest {
+        @NotNull(message = "El ID de inventario es obligatorio")
+        private Long inventarioId;
+
+        @Min(value = 1, message = "La cantidad debe ser mayor a 0")
+        private int cantidad;
     }
 }

@@ -22,13 +22,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CarroService {
 
-    private final CarroRepository ventaRepository;
+    private final CarroRepository carroRepository;
     private final MicroserviceClient microserviceClient;
 
-    // Métodos existentes
-    public InventarioResponse reducirCantidad(Long id) {
+    private InventarioResponse actualizarInventario(Long id, String accion) {
         String token = TokenContext.getToken();
-        String url = "http://localhost:9017/api/inventario/"+id+"/vender";
+        String url = String.format("http://localhost:9017/api/inventario/%d/%s", id, accion);
         ResponseEntity<InventarioResponse> response = microserviceClient.enviarConToken(
                 url,
                 HttpMethod.POST,
@@ -38,30 +37,13 @@ public class CarroService {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Error al reducir cantidad en inventario");
-        }
-
-        return response.getBody();
-    }
-    public InventarioResponse cancelarVenta(Long id) {
-        String token = TokenContext.getToken();
-        String url = "http://localhost:9017/api/inventario/"+id+"/cancelar-venta";
-        ResponseEntity<InventarioResponse> response = microserviceClient.enviarConToken(
-                url,
-                HttpMethod.POST,
-                null,
-                InventarioResponse.class,
-                token
-        );
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Error al reducir cantidad en inventario");
+            throw new RuntimeException("Error al actualizar inventario");
         }
 
         return response.getBody();
     }
 
-    public InventarioDto BuscarporID(Long inventarioId) {
+    private InventarioDto obtenerProductoInventario(Long inventarioId) {
         String token = TokenContext.getToken();
         String url = "http://localhost:9017/api/inventario/" + inventarioId;
         ResponseEntity<InventarioDto> response = microserviceClient.enviarConToken(
@@ -73,195 +55,158 @@ public class CarroService {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Error al obtener registro de inventario");
+            throw new RuntimeException("Error al obtener producto de inventario");
         }
 
         return response.getBody();
     }
 
-    // Nuevos métodos CRUD
-
     @Transactional
-    public ServiceResult<CarroResponse> crearVenta(CarroRequest request) {
+    public ServiceResult<CarroResponse> agregarProductosAlCarro(CarroRequest request) {
+        List<String> errores = new ArrayList<>();
+        List<DetalleCarro> detalles = new ArrayList<>();
+        double total = 0.0;
 
-        List<String> errors = new ArrayList<>();
-        List<DetalleCarro> detallesEntidad = new ArrayList<>();
-        double totalVenta = 0.0;
+        for (CarroRequest.DetalleCarroRequest detalleReq : request.getDetalles()) {
+            InventarioDto producto;
 
-        // 1. Validar y procesar cada detalle
-        for (CarroRequest.DetalleVentaRequest dvReq : request.getDetalles()) {
-
-            InventarioDto inventario = null;
             try {
-                inventario = BuscarporID(dvReq.getInventarioId());
-            } catch (Exception ex) {
-                errors.add("Error al consultar inventario " + dvReq.getInventarioId() + ": " + ex.getMessage());
-                continue; // pasa al siguiente ítem, aún queremos acumular errores
-            }
-
-            if (inventario == null) {
-                errors.add("Inventario " + dvReq.getInventarioId() + " no existe");
+                producto = obtenerProductoInventario(detalleReq.getInventarioId());
+            } catch (Exception e) {
+                errores.add("Producto no disponible: " + detalleReq.getInventarioId());
                 continue;
             }
 
-            if (inventario.getCantidad() < dvReq.getCantidad()) {
-                errors.add("Stock insuficiente para producto "
-                        + inventario.getProducto().getNombre());
+            if (producto.getCantidad() < detalleReq.getCantidad()) {
+                errores.add("Stock insuficiente para: " + producto.getProducto().getNombre());
                 continue;
             }
 
-            // Reducir inventario
-            try {
-                reducirCantidad(inventario.getId());
-            } catch (Exception ex) {
-                errors.add("No se pudo descontar stock del inventario " + inventario.getId()
-                        + ": " + ex.getMessage());
-                continue;
-            }
+            double precio = producto.getProducto().getPrecio();
+            double subtotal = precio * detalleReq.getCantidad();
+            total += subtotal;
 
-            // Calcular subtotal
-            double precioUnitario = inventario.getProducto().getPrecio();
-            double subtotal = precioUnitario * dvReq.getCantidad();
-            totalVenta += subtotal;
-
-            // Construir detalle entidad
             DetalleCarro detalle = DetalleCarro.builder()
-                    .productoId(inventario.getProducto().getId())
-                    .cantidad(dvReq.getCantidad())
-                    .precioUnitario(precioUnitario)
+                    .productoId(producto.getProducto().getId())
+                    .cantidad(detalleReq.getCantidad())
+                    .precioUnitario(precio)
                     .subtotal(subtotal)
                     .build();
 
-            detallesEntidad.add(detalle);
+            detalles.add(detalle);
         }
 
-        // Si hubo errores que impidan continuar, retornar sin guardar
-        if (!errors.isEmpty()) {
-            return new ServiceResult<>(errors);
+        if (!errores.isEmpty()) {
+            return new ServiceResult<>(errores);
         }
 
-        // 2. Construir y guardar la venta
-        Carro venta = Carro.builder()
-                .sucursalId(request.getSucursalId())
-                .clienteId(request.getClienteId())
-                .fechaVenta(LocalDateTime.now())
-                .total(totalVenta)
-                .estado("COMPLETADA")
-                .detalles(detallesEntidad)
+        Carro carro = Carro.builder()
+                .usuarioId(request.getUsuarioId())
+                .fechaCreacion(LocalDateTime.now())
+                .total(total)
+                .estado("ACTIVO")
                 .build();
+        for (DetalleCarro d : detalles) {
+            d.setCarro(carro);
+        }
+        carro.setDetalles(detalles);
+        carro = carroRepository.save(carro);
+        final Carro carroFinal = carro;
 
-        detallesEntidad.forEach(d -> d.setVenta(venta));
+        detalles.forEach(d -> d.setCarro(carroFinal));
 
-        Carro ventaGuardada;
         try {
-            ventaGuardada = ventaRepository.save(venta);
-        } catch (Exception ex) {
-            errors.add("Error al guardar la venta en base de datos: " + ex.getMessage());
-            return new ServiceResult<>(errors);
+            carro = carroRepository.save(carro);
+        } catch (Exception e) {
+            errores.add("Error al guardar el carro");
+            return new ServiceResult<>(errores);
         }
 
-        // 3. Construir DTO de respuesta
-        List<CarroResponse.DetalleResponse> detalleResponses = ventaGuardada.getDetalles().stream()
-                .map(d -> CarroResponse.DetalleResponse.builder()
-                        .productoId(d.getProductoId())
-                        .cantidad(d.getCantidad())
-                        .precioUnitario(d.getPrecioUnitario())
-                        .subtotal(d.getSubtotal())
-                        .build())
-                .collect(Collectors.toList());
-
-        CarroResponse response = CarroResponse.builder()
-                .ventaId(ventaGuardada.getId())
-                .clienteId(ventaGuardada.getClienteId())
-                .sucursalId(ventaGuardada.getSucursalId())
-                .fechaVenta(ventaGuardada.getFechaVenta())
-                .total(ventaGuardada.getTotal())
-                .detalles(detalleResponses)
-                .build();
-
-        return new ServiceResult<>(response);
+        return new ServiceResult<>(mapearCarroAResponse(carro));
     }
 
-
-
     @Transactional
-    public ServiceResult<Void> cancelarVentaMetodo(Long ventaId) {
+    public ServiceResult<Void> vaciarCarro(Long carroId) {
+        List<String> errores = new ArrayList<>();
 
-        List<String> errors = new ArrayList<>();
-
-        Carro venta = ventaRepository.findById(ventaId).orElse(null);
-        if (venta == null) {
-            errors.add("La venta " + ventaId + " no existe");
-            return new ServiceResult<>(errors);
+        Carro carro = carroRepository.findById(carroId).orElse(null);
+        if (carro == null) {
+            errores.add("Carro no encontrado");
+            return new ServiceResult<>(errores);
         }
 
-        if ("ANULADA".equalsIgnoreCase(venta.getEstado())) {
-            errors.add("La venta " + ventaId + " ya está anulada");
-            return new ServiceResult<>(errors);
+        if ("VACIO".equalsIgnoreCase(carro.getEstado())) {
+            errores.add("El carro ya está vacío");
+            return new ServiceResult<>(errores);
         }
 
-        for (DetalleCarro det : venta.getDetalles()) {
-            try {
-                cancelarVenta(det.getProductoId());
-            } catch (Exception ex) {
-                errors.add("No se pudo reponer stock del producto " + det.getProductoId()
-                        + ": " + ex.getMessage());
-            }
-        }
+        carro.setEstado("VACIO");
+        carro.getDetalles().clear();
+        carro.setTotal(0.0);
 
-        if (!errors.isEmpty()) {
-            return new ServiceResult<>(errors);
-        }
-
-        venta.setEstado("ANULADA");
         try {
-            ventaRepository.save(venta);
-        } catch (Exception ex) {
-            errors.add("Error al actualizar la venta en BD: " + ex.getMessage());
-            return new ServiceResult<>(errors);
+            carroRepository.save(carro);
+        } catch (Exception e) {
+            errores.add("Error al vaciar el carro");
+            return new ServiceResult<>(errores);
         }
 
         return new ServiceResult<>((Void) null);
     }
-    @Transactional(readOnly = true)
-    public ServiceResult<List<CarroResponse>> listarVentas() {
 
-        List<CarroResponse> respuestas = ventaRepository.findAll().stream()
-                .map(v -> CarroResponse.builder()
-                        .ventaId(v.getId())
-                        .sucursalId(v.getSucursalId())
-                        .clienteId(v.getClienteId())
-                        .fechaVenta(v.getFechaVenta())
-                        .total(v.getTotal())
-                        .detalles(
-                                v.getDetalles().stream()
-                                        .map(d -> CarroResponse.DetalleResponse.builder()
-                                                .productoId(d.getProductoId())
-                                                .cantidad(d.getCantidad())
-                                                .precioUnitario(d.getPrecioUnitario())
-                                                .subtotal(d.getSubtotal())
-                                                .build())
-                                        .collect(Collectors.toList())
-                        )
-                        .build())
+    @Transactional(readOnly = true)
+    public ServiceResult<List<CarroResponse>> listarCarrosPorUsuario(Long usuarioId) {
+        List<Carro> carros = carroRepository.findByUsuarioId(usuarioId);
+        List<CarroResponse> responses = carros.stream()
+                .map(this::mapearCarroAResponse)
                 .collect(Collectors.toList());
 
-        return new ServiceResult<>(respuestas);
+        return new ServiceResult<>(responses);
     }
 
     @Transactional(readOnly = true)
-    public ServiceResult<CarroResponse> obtenerVentaPorId(Long ventaId) {
-        List<String> errors = new ArrayList<>();
+    public ServiceResult<CarroResponse> obtenerCarroPorId(Long carroId) {
+        List<String> errores = new ArrayList<>();
+        Carro carro = carroRepository.findById(carroId).orElse(null);
 
-        Carro venta = ventaRepository.findById(ventaId).orElse(null);
-
-        if (venta == null) {
-            errors.add("Venta con ID " + ventaId + " no encontrada");
-            return new ServiceResult<>(errors);
+        if (carro == null) {
+            errores.add("Carro no encontrado");
+            return new ServiceResult<>(errores);
         }
 
-        // Mapear la entidad Venta a VentaResponse
-        List<CarroResponse.DetalleResponse> detallesResponse = venta.getDetalles().stream()
+        return new ServiceResult<>(mapearCarroAResponse(carro));
+    }
+
+    @Transactional
+    public ServiceResult<CarroResponse> confirmarCompra(Long carroId) {
+        List<String> errores = new ArrayList<>();
+        Carro carro = carroRepository.findById(carroId).orElse(null);
+
+        if (carro == null) {
+            errores.add("Carro no encontrado");
+            return new ServiceResult<>(errores);
+        }
+
+        for (DetalleCarro detalle : carro.getDetalles()) {
+            try {
+                actualizarInventario(detalle.getProductoId(), "vender");
+            } catch (Exception e) {
+                errores.add("Error al confirmar producto: " + detalle.getProductoId());
+            }
+        }
+
+        if (!errores.isEmpty()) {
+            return new ServiceResult<>(errores);
+        }
+
+        carro.setEstado("COMPLETADO");
+        carro = carroRepository.save(carro);
+
+        return new ServiceResult<>(mapearCarroAResponse(carro));
+    }
+
+    private CarroResponse mapearCarroAResponse(Carro carro) {
+        List<CarroResponse.DetalleResponse> detalles = carro.getDetalles().stream()
                 .map(d -> CarroResponse.DetalleResponse.builder()
                         .productoId(d.getProductoId())
                         .cantidad(d.getCantidad())
@@ -270,17 +215,13 @@ public class CarroService {
                         .build())
                 .collect(Collectors.toList());
 
-        CarroResponse response = CarroResponse.builder()
-                .ventaId(venta.getId())
-                .clienteId(venta.getClienteId())
-                .sucursalId(venta.getSucursalId())
-                .fechaVenta(venta.getFechaVenta())
-                .total(venta.getTotal())
-//                .estado(venta.getEstado())
-                .detalles(detallesResponse)
+        return CarroResponse.builder()
+                .carroId(carro.getId())
+                .usuarioId(carro.getUsuarioId())
+                .fechaCreacion(carro.getFechaCreacion())
+                .total(carro.getTotal())
+                .estado(carro.getEstado())
+                .detalles(detalles)
                 .build();
-
-        return new ServiceResult<>(response);
     }
-
 }
