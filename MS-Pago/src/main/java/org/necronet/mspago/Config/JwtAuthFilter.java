@@ -1,4 +1,4 @@
-package org.necronet.mscliente.Config;
+package org.necronet.mspago.Config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

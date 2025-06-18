@@ -1,4 +1,4 @@
-package org.necronet.mscliente.Config.Dto;
+package org.necronet.mspago.Config.Dto;
 
 import lombok.*;
 

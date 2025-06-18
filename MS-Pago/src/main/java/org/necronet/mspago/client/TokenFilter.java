@@ -1,4 +1,4 @@
-package com.app.inventario.shared;
+package org.necronet.mspago.client;
 
 
 import jakarta.servlet.*;
@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
 @Component
 public class TokenFilter implements Filter {
 

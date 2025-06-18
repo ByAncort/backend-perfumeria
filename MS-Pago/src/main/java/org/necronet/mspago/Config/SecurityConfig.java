@@ -1,4 +1,4 @@
-package org.necronet.mscliente.Config;
+package org.necronet.mspago.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
