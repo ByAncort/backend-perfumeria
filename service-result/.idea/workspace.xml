@@ -5,48 +5,46 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9924159c-bda5-4361-a9ea-a1984bb5e105" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Controller/CarroController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/AuthClientService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/Dto/TokenResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/JwtAuthFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/OpenApiConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/RestTemplateConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Service/ClienteService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/Service/ClienteServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/controller/ClienteController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/model/Cliente.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/model/Compra.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/model/Contacto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/repository/ClienteRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Cliente/src/main/java/org/necronet/mscliente/repository/CompraRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/AuthClientService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/Dto/TokenResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/JwtAuthFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/OpenApiConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/RestTemplateConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/Config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/client/MicroserviceClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/client/TokenContext.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/client/TokenFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/controller/PagoController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/dto/CarritoResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/model/EstadoPago.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/model/MetodoPago.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/model/Pago.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/repository/PagoRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/service/PagoService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Pago/src/main/java/org/necronet/mspago/service/PagoServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Controller/VentaController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/CarroResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Dto/InventarioResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/Carro.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/Carro.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/DetalleCarro.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Models/DetalleCarro.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Repository/CarroRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Repository/CarroRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Service/CarroService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Carrito/src/main/java/com/app/ventas/Service/CarroService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Producto/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Producto/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/Config/AuthClientService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/Config/Dto/TokenResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/Config/JwtAuthFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/Config/OpenApiConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/Config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/Config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/controller/LogisticaController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/dto/EnvioDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/dto/PagoDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/dto/RutaOptimizadaDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/dto/SeguimientoResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/model/Envio.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/model/RutaOptimizada.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/repository/EnvioRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/service/LogisticaService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/shared/MicroserviceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/shared/TokenContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/java/org/necronet/mslogistica/shared/TokenFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/Config/AuthClientService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/Config/Dto/TokenResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/Config/JwtAuthFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/Config/OpenApiConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/Config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/Config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/controller/LogisticaController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/dto/EnvioDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/dto/PagoDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/dto/RutaOptimizadaDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/dto/SeguimientoResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/model/Envio.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/model/RutaOptimizada.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/repository/EnvioRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/service/LogisticaService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/shared/MicroserviceClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/shared/TokenContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/java/org/necronet/mslogistica/shared/TokenFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MS-Logistica2/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS- Inventario/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MS- Inventario/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MS-Authenticacion/src/main/java/com/app/auth/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Authenticacion/src/main/java/com/app/auth/Controller/AuthController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -84,28 +82,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Maven.service-result [clean,install].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "dev",
-    "last_opened_file_path": "C:/Users/diego/Desktop/MICRO SERVICIOS/service-result",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "C:/Users/diego/Desktop/MICRO SERVICIOS/service-result/src/main/java/org/app/Main.java",
-    "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "vcs.log",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.service-result [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/diego/Desktop/MICRO SERVICIOS/service-result&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/diego/Desktop/MICRO SERVICIOS/service-result/src/main/java/org/app/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.log&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="mvn clean install" />
@@ -128,6 +126,7 @@
       <updated>1750131309129</updated>
       <workItem from="1750131310257" duration="977000" />
       <workItem from="1750213199212" duration="653000" />
+      <workItem from="1750636593491" duration="2689000" />
     </task>
     <servers />
   </component>
