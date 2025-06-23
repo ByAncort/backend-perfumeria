@@ -1,8 +1,6 @@
 package com.app.usuarios.Controller;
 
-import com.app.usuarios.Dto.ServiceResult;
-import com.app.usuarios.Dto.UserDto;
-import com.app.usuarios.Dto.UserResponseDto;
+import com.app.usuarios.Dto.*;
 import com.app.usuarios.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.service.spi.ServiceException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -109,4 +109,5 @@ public class UserController {
                 ? ResponseEntity.status(404).body(result.getErrors())
                 : ResponseEntity.ok(result.getData());
     }
+
 }

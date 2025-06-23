@@ -78,7 +78,40 @@ public class AuthController {
         );
     }
 
-
+    @Operation(
+            summary = "Registrar nuevo usuario",
+            description = "Crea una nueva cuenta de usuario"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuario registrado exitosamente",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "El usuario ya existe",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            )
+    })
+    @PostMapping(value = "register")
+    public ResponseEntity<AuthResponse> registerUser(@RequestBody RegisterRequest request) {
+        try {
+            AuthResponse response = authService.createUser(request);
+            return ResponseEntity.ok(response);
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(AuthResponse.builder().message(e.getMessage()).build());
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(AuthResponse.builder().message(e.getMessage()).build());
+        }
+    }
 
     @Operation(hidden = true)
     @ExceptionHandler({
