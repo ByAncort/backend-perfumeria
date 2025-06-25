@@ -123,7 +123,7 @@ public class SucursalController {
             @PathVariable Long id,
             @Parameter(description = "Nuevo estado de la sucursal (true=activa, false=inactiva)", required = true)
             @RequestParam boolean activa) {
-        ServiceResult<Void> result = sucursalService.cambiarEstadoSucursal(id, activa);
+        ServiceResult<SucursalDto> result = sucursalService.cambiarEstadoSucursal(id, activa);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }

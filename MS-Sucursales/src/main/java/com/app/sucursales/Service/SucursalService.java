@@ -19,7 +19,7 @@ public class SucursalService {
 
     public ServiceResult<SucursalDto> crearSucursal(SucursalDto dto) {
         try {
-            // Validación básica
+
             if (dto.getHorarioApertura() != null && dto.getHorarioCierre() != null
                     && dto.getHorarioApertura().isAfter(dto.getHorarioCierre())) {
                 return new ServiceResult<>(List.of("El horario de apertura no puede ser después del horario de cierre"));
@@ -89,13 +89,13 @@ public class SucursalService {
         }
     }
 
-    public ServiceResult<Void> cambiarEstadoSucursal(Long id, boolean activa) {
+    public ServiceResult<SucursalDto> cambiarEstadoSucursal(Long id, boolean activa) {
         try {
             Sucursal sucursal = sucursalRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
             sucursal.setActiva(activa);
             sucursalRepository.save(sucursal);
-            return new ServiceResult<>(null);
+            return new ServiceResult<>(convertToDto(sucursal));
         } catch (Exception e) {
             return new ServiceResult<>(List.of("Error al cambiar el estado de la sucursal: " + e.getMessage()));
         }
@@ -113,7 +113,7 @@ public class SucursalService {
         }
     }
 
-    private SucursalDto convertToDto(Sucursal sucursal) {
+    public SucursalDto convertToDto(Sucursal sucursal) {
         return SucursalDto.builder()
                 .id(sucursal.getId())
                 .nombre(sucursal.getNombre())
