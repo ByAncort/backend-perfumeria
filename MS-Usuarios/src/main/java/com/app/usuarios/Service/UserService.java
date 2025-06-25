@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
