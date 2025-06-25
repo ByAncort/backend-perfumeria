@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,14 +26,24 @@ public class Carro {
     private LocalDateTime fechaCreacion;
 
     @Column(nullable = false)
+    private Double subtotal;
+
+    @Column(nullable = false)
+    private Double descuento;
+
+    @Column(nullable = false)
     private Double total;
+
+    @Column
+    private String codigoCupon;
 
     @Column(nullable = false)
     @Builder.Default
-    private String estado = "ACTIVO"; // Posibles valores: ACTIVO, VACIO, COMPLETADO, ABANDONADO
+    private String estado = "ACTIVO"; // ACTIVO, VACIO, COMPLETADO, ABANDONADO
 
     @OneToMany(mappedBy = "carro", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetalleCarro> detalles;
+    @Builder.Default
+    private List<DetalleCarro> detalles = new ArrayList<>();
 
     @Version
     private Long version; // Para control de concurrencia
@@ -41,13 +52,26 @@ public class Carro {
     public void agregarDetalle(DetalleCarro detalle) {
         detalle.setCarro(this);
         this.detalles.add(detalle);
-        calcularTotal();
+        this.calcularTotales();
     }
 
-    // Método helper para calcular el total
-    public void calcularTotal() {
-        this.total = this.detalles.stream()
+    // Método helper para calcular subtotal y total
+    public void calcularTotales() {
+        this.subtotal = this.detalles.stream()
                 .mapToDouble(DetalleCarro::getSubtotal)
                 .sum();
+
+        // Si hay un descuento aplicado, mantenerlo
+        this.total = this.subtotal - this.descuento;
+    }
+
+    // Método para limpiar el carro
+    public void vaciarCarro() {
+        this.detalles.clear();
+        this.subtotal = 0.0;
+        this.descuento = 0.0;
+        this.total = 0.0;
+        this.codigoCupon = null;
+        this.estado = "VACIO";
     }
 }

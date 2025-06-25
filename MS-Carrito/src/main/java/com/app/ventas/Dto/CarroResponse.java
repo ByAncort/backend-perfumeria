@@ -7,22 +7,25 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CarroResponse {
     private Long carroId;
     private Long usuarioId;
     private LocalDateTime fechaCreacion;
+    private Double subtotal;
+    private Double descuento;
     private Double total;
+    private String codigoCupon;
     private String estado;
     private List<DetalleResponse> detalles;
 
     @Getter
     @Setter
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class DetalleResponse {
         private Long productoId;
         private int cantidad;
