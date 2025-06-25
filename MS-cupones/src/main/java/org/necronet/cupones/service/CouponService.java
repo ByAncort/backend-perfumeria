@@ -132,7 +132,7 @@ public class CouponService {
         }
     }
 
-    private CouponDto convertToDto(Coupon coupon) {
+    public CouponDto convertToDto(Coupon coupon) {
         return CouponDto.builder()
                 .id(coupon.getId())
                 .code(coupon.getCode())
