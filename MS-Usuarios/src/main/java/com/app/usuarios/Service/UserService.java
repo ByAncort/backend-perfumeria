@@ -76,7 +76,7 @@ public class UserService {
         }
     }
 
-    private UserResponseDto toDto(User user) {
+    public UserResponseDto toDto(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -119,7 +119,7 @@ public class UserService {
         return userRepository.save(user);
     }
     public User registerUser(RegisterRequest userRequest) {
-        // Validación de entrada
+        
         if (userRequest == null) {
             throw new IllegalArgumentException("RegisterRequest cannot be null");
         }

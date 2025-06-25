@@ -37,7 +37,7 @@ class ProveedorServiceTest {
     void setUp() {
         faker = new Faker();
 
-        // Configurar un ProveedorDto válido
+        
         proveedorDtoValido = new ProveedorDto();
         proveedorDtoValido.setNombre(faker.company().name());
         proveedorDtoValido.setRut(generarRutValido());
@@ -45,7 +45,7 @@ class ProveedorServiceTest {
         proveedorDtoValido.setEmail(faker.internet().emailAddress());
         proveedorDtoValido.setTelefono("+569" + faker.number().digits(8));
 
-        // Configurar un Proveedor válido
+        
         proveedorValido = new Proveedor();
         proveedorValido.setId(1L);
         proveedorValido.setNombre(proveedorDtoValido.getNombre());
@@ -78,14 +78,14 @@ class ProveedorServiceTest {
 
     @Test
     void addProveedor_ConDatosValidos_RetornaProveedorGuardado() {
-        // Arrange
+        
         when(proveedorRepository.existsByRut(anyString())).thenReturn(false);
         when(proveedorRepository.save(any(Proveedor.class))).thenReturn(proveedorValido);
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.addProveedor(proveedorDtoValido);
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertNotNull(resultado.getData());
         assertEquals(proveedorValido.getNombre(), resultado.getData().getNombre());
@@ -94,13 +94,13 @@ class ProveedorServiceTest {
 
     @Test
     void addProveedor_ConRutInvalido_RetornaError() {
-        // Arrange
-        proveedorDtoValido.setRut("12345678-0"); // DV incorrecto
+        
+        proveedorDtoValido.setRut("12345678-0"); 
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.addProveedor(proveedorDtoValido);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("RUT no es válido"));
         verify(proveedorRepository, never()).save(any(Proveedor.class));
@@ -108,13 +108,13 @@ class ProveedorServiceTest {
 
     @Test
     void addProveedor_ConRutExistente_RetornaError() {
-        // Arrange
+        
         when(proveedorRepository.existsByRut(anyString())).thenReturn(true);
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.addProveedor(proveedorDtoValido);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("RUT ya está registrado"));
         verify(proveedorRepository, never()).save(any(Proveedor.class));
@@ -122,13 +122,13 @@ class ProveedorServiceTest {
 
     @Test
     void addProveedor_ConEmailInvalido_RetornaError() {
-        // Arrange
+        
         proveedorDtoValido.setEmail("emailinvalido");
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.addProveedor(proveedorDtoValido);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("formato del email es inválido"));
         verify(proveedorRepository, never()).save(any(Proveedor.class));
@@ -136,13 +136,13 @@ class ProveedorServiceTest {
 
     @Test
     void addProveedor_ConTelefonoInvalido_RetornaError() {
-        // Arrange
+        
         proveedorDtoValido.setTelefono("123456789");
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.addProveedor(proveedorDtoValido);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("formato del teléfono es inválido"));
         verify(proveedorRepository, never()).save(any(Proveedor.class));
@@ -150,14 +150,14 @@ class ProveedorServiceTest {
 
     @Test
     void getAllProveedoresActivos_RetornaListaProveedores() {
-        // Arrange
+        
         List<Proveedor> proveedores = List.of(proveedorValido);
         when(proveedorRepository.findByActivoTrue()).thenReturn(proveedores);
 
-        // Act
+        
         ServiceResult<List<Proveedor>> resultado = proveedorService.getAllProveedoresActivos();
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertEquals(1, resultado.getData().size());
         verify(proveedorRepository, times(1)).findByActivoTrue();
@@ -165,13 +165,13 @@ class ProveedorServiceTest {
 
     @Test
     void getProveedorById_ConIdExistente_RetornaProveedor() {
-        // Arrange
+        
         when(proveedorRepository.findById(1L)).thenReturn(Optional.of(proveedorValido));
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.getProveedorById(1L);
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertEquals(proveedorValido.getId(), resultado.getData().getId());
         verify(proveedorRepository, times(1)).findById(1L);
@@ -179,13 +179,13 @@ class ProveedorServiceTest {
 
     @Test
     void getProveedorById_ConIdInexistente_RetornaError() {
-        // Arrange
+        
         when(proveedorRepository.findById(99L)).thenReturn(Optional.empty());
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.getProveedorById(99L);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("no encontrado"));
         verify(proveedorRepository, times(1)).findById(99L);
@@ -193,18 +193,18 @@ class ProveedorServiceTest {
 
     @Test
     void updateProveedor_ConDatosValidos_RetornaProveedorActualizado() {
-        // Arrange
+        
         when(proveedorRepository.findById(1L)).thenReturn(Optional.of(proveedorValido));
         when(proveedorRepository.save(any(Proveedor.class))).thenReturn(proveedorValido);
 
-        // Modificar algunos datos
+        
         proveedorDtoValido.setNombre("Nuevo Nombre");
         proveedorDtoValido.setDireccion("Nueva Dirección");
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.updateProveedor(1L, proveedorDtoValido);
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertEquals("Nuevo Nombre", resultado.getData().getNombre());
         assertEquals("Nueva Dirección", resultado.getData().getDireccion());
@@ -213,14 +213,14 @@ class ProveedorServiceTest {
 
     @Test
     void updateProveedor_ConRutModificado_RetornaError() {
-        // Arrange
+        
         when(proveedorRepository.findById(1L)).thenReturn(Optional.of(proveedorValido));
-        proveedorDtoValido.setRut(generarRutValido()); // Nuevo RUT diferente
+        proveedorDtoValido.setRut(generarRutValido()); 
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.updateProveedor(1L, proveedorDtoValido);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("No se puede modificar el RUT"));
         verify(proveedorRepository, never()).save(any(Proveedor.class));
@@ -228,14 +228,14 @@ class ProveedorServiceTest {
 
     @Test
     void toggleActivoProveedor_ConIdExistente_RetornaProveedorActualizado() {
-        // Arrange
+        
         when(proveedorRepository.findById(1L)).thenReturn(Optional.of(proveedorValido));
         when(proveedorRepository.save(any(Proveedor.class))).thenReturn(proveedorValido);
 
-        // Act - Desactivar
+        
         ServiceResult<Proveedor> resultado = proveedorService.toggleActivoProveedor(1L, false);
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertFalse(resultado.getData().isActivo());
         verify(proveedorRepository, times(1)).save(any(Proveedor.class));
@@ -243,14 +243,14 @@ class ProveedorServiceTest {
 
     @Test
     void getProveedorByRut_ConRutValido_RetornaProveedor() {
-        // Arrange
+        
         String rutNormalizado = proveedorService.normalizarRut(proveedorDtoValido.getRut());
         when(proveedorRepository.findByRut(rutNormalizado)).thenReturn(Optional.of(proveedorValido));
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.getProveedorByRut(proveedorDtoValido.getRut());
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertEquals(proveedorValido.getId(), resultado.getData().getId());
         verify(proveedorRepository, times(1)).findByRut(rutNormalizado);
@@ -258,14 +258,14 @@ class ProveedorServiceTest {
 
     @Test
     void deleteProveedor_ConIdExistente_RetornaProveedorEliminado() {
-        // Arrange
+        
         when(proveedorRepository.findById(1L)).thenReturn(Optional.of(proveedorValido));
         doNothing().when(proveedorRepository).delete(proveedorValido);
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.deleteProveedor(1L);
 
-        // Assert
+        
         assertTrue(resultado.getErrors().isEmpty());
         assertEquals(proveedorValido.getId(), resultado.getData().getId());
         verify(proveedorRepository, times(1)).delete(proveedorValido);
@@ -273,13 +273,13 @@ class ProveedorServiceTest {
 
     @Test
     void deleteProveedor_ConIdInexistente_RetornaError() {
-        // Arrange
+        
         when(proveedorRepository.findById(99L)).thenReturn(Optional.empty());
 
-        // Act
+        
         ServiceResult<Proveedor> resultado = proveedorService.deleteProveedor(99L);
 
-        // Assert
+        
         assertFalse(resultado.getErrors().isEmpty());
         assertTrue(resultado.getErrors().get(0).contains("no encontrado"));
         verify(proveedorRepository, never()).delete(any(Proveedor.class));
@@ -287,26 +287,25 @@ class ProveedorServiceTest {
 
     @Test
     void validarRutChileno_ConRutValido_RetornaTrue() {
-        // Arrange
+        
         String rutValido = generarRutValido();
 
-        // Act
+        
         boolean resultado = proveedorService.validarRutChileno(rutValido);
 
-        // Assert
+        
         assertTrue(resultado);
     }
 
     @Test
     void normalizarRut_ConRutConPuntosYGuion_RetornaRutLimpio() {
-        // Arrange
+        
         String rutConFormato = "12.345.678-5";
         String rutEsperado = "12345678-5";
 
-        // Act
         String resultado = proveedorService.normalizarRut(rutConFormato);
 
-        // Assert
+        
         assertEquals(rutEsperado, resultado);
     }
 }

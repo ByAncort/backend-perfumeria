@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class ProveedorService {
     private final ProveedorRepository proveedorRepository;
     private static final Logger logger = LoggerFactory.getLogger(Proveedor.class);
-    //    EXPRESIONES PARA VALIDAR DATOS CON REGEX
+    
     private static final Pattern RUT_PATTERN = Pattern.compile("^\\d{1,8}-[\\dkK]$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?56?\\d{9}$");
@@ -148,13 +148,13 @@ public class ProveedorService {
                 return new ServiceResult<>(errors);
             }
 
-            // Validar coincidencia de RUT
+            
             if (!normalizarRut(dto.getRut()).equals(proveedorExistente.getRut())) {
                 errors.add("No se puede modificar el RUT");
                 return new ServiceResult<>(errors);
             }
 
-            // Validaciones de campos
+            
             if (dto.getNombre() == null || dto.getNombre().isBlank()) {
                 errors.add("El nombre es obligatorio");
             }
@@ -173,7 +173,7 @@ public class ProveedorService {
                 return new ServiceResult<>(errors);
             }
 
-            // Actualizar campos
+            
             proveedorExistente.setNombre(dto.getNombre());
             proveedorExistente.setDireccion(dto.getDireccion());
             proveedorExistente.setEmail(dto.getEmail());
