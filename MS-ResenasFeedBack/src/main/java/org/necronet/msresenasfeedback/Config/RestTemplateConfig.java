@@ -1,4 +1,4 @@
-package org.necronet.mslogistica.Config;
+package org.necronet.msresenasfeedback.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

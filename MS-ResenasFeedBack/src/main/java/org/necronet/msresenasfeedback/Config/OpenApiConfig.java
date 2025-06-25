@@ -1,4 +1,4 @@
-package org.necronet.mslogistica.Config;
+package org.necronet.msresenasfeedback.Config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -16,9 +16,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API de Logistica")
+                        .title("API de Reseña y feedback")
                         .version("1.0")
-                        .description("API para gestión de envíos, seguimiento de pedidos y optimización de rutas")
+                        .description("API para la gestión de reseñas de productos por clientes")
 
                         .license(new License()
                                 .name("Apache 2.0")

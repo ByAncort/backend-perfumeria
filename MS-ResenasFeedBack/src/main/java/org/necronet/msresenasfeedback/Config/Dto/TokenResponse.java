@@ -1,4 +1,4 @@
-package org.necronet.mslogistica.Config.Dto;
+package org.necronet.msresenasfeedback.Config.Dto;
 
 import lombok.*;
 

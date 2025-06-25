@@ -1,7 +1,7 @@
-package org.necronet.mslogistica.Config;
+package org.necronet.msresenasfeedback.Config;
 
 
-import org.necronet.mslogistica.Config.Dto.TokenResponse;
+import org.necronet.msresenasfeedback.Config.Dto.TokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

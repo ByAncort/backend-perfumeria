@@ -1,4 +1,4 @@
-package org.necronet.mslogistica.Config;
+package org.necronet.msresenasfeedback.Config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
