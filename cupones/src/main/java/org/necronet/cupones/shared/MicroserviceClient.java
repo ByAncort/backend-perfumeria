@@ -1,4 +1,4 @@
-package org.necronet.msresenasfeedback.shared;
+package org.necronet.cupones.shared;
 
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

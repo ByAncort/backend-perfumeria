@@ -1,4 +1,4 @@
-package org.necronet.msresenasfeedback.Config;
+package org.necronet.cupones.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

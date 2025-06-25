@@ -1,4 +1,4 @@
-package org.necronet.msresenasfeedback.Config.Dto;
+package org.necronet.cupones.Config.Dto;
 
 import lombok.*;
 

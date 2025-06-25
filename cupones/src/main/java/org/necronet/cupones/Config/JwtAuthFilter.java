@@ -1,4 +1,4 @@
-package org.necronet.msresenasfeedback.Config;
+package org.necronet.cupones.Config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

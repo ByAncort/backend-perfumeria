@@ -1,4 +1,4 @@
-package org.necronet.msresenasfeedback.Config;
+package org.necronet.cupones.Config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

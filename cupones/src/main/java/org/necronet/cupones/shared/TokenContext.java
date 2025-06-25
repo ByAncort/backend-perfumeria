@@ -1,4 +1,4 @@
-package org.necronet.msresenasfeedback.shared;
+package org.necronet.cupones.shared;
 
 public class TokenContext {
     private static final ThreadLocal<String> currentToken = new ThreadLocal<>();

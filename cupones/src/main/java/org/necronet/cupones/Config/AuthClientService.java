@@ -1,7 +1,7 @@
-package org.necronet.msresenasfeedback.Config;
+package org.necronet.cupones.Config;
 
 
-import org.necronet.msresenasfeedback.Config.Dto.TokenResponse;
+import org.necronet.cupones.Config.Dto.TokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
