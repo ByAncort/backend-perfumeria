@@ -76,7 +76,7 @@ public class ProveedorService {
         }
     }
 
-    private boolean validarRutChileno(String rut) {
+    public boolean validarRutChileno(String rut) {
         String rutLimpio = normalizarRut(rut);
 
         if (!RUT_PATTERN.matcher(rutLimpio).matches()) {
@@ -105,7 +105,7 @@ public class ProveedorService {
         return dv.equals(dvCalculado);
     }
 
-    private String normalizarRut(String rut) {
+    public String normalizarRut(String rut) {
         return rut.replaceAll("[^0-9kK-]", "").toUpperCase();
     }
 
