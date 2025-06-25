@@ -4,37 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9924159c-bda5-4361-a9ea-a1984bb5e105" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/Config/AuthClientService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/Config/Dto/TokenResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/Config/JwtAuthFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/Config/OpenApiConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/Config/RestTemplateConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/Config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/controller/SoporteController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/dto/ClienteDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/dto/TicketRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/dto/TicketSoporteDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/dto/TicketUpdateRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/model/EstadoTicket.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/model/PrioridadTicket.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/model/TicketSoporte.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/model/TipoTicket.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/repository/TicketSoporteRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/service/SoporteService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/shared/MicroserviceClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/shared/TokenContext.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/java/org/necronet/mssoportecliente/shared/TokenFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-SoporteCliente/src/main/resources/application.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Controller/UserAlreadyExistsException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Dto/AuthResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Dto/RegisterRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Authenticacion/src/main/java/com/app/auth/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Authenticacion/src/main/java/com/app/auth/Controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MS-Usuarios/src/main/java/com/app/usuarios/Service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="9924159c-bda5-4361-a9ea-a1984bb5e105" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
