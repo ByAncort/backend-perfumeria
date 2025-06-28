@@ -11,10 +11,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/sucursales")
@@ -42,7 +48,20 @@ public class SucursalController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        SucursalDto sucursal = result.getData();
+        EntityModel<SucursalDto> resource = EntityModel.of(sucursal);
+
+        // Self link
+        resource.add(linkTo(methodOn(SucursalController.class).crearSucursal(dto)).withSelfRel());
+        // Links relacionados
+        resource.add(linkTo(methodOn(SucursalController.class).obtenerSucursal(sucursal.getId())).withRel("self"));
+        resource.add(linkTo(methodOn(SucursalController.class).actualizarSucursal(sucursal.getId(), dto)).withRel("update"));
+        resource.add(linkTo(methodOn(SucursalController.class).cambiarEstadoSucursal(sucursal.getId(), true)).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(SucursalController.class).listarSucursales()).withRel("all-sucursales"));
+        resource.add(linkTo(methodOn(SucursalController.class).buscarSucursalesActivas()).withRel("active-sucursales"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -62,7 +81,17 @@ public class SucursalController {
         if (result.hasErrors()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(result.getData());
+
+        SucursalDto sucursal = result.getData();
+        EntityModel<SucursalDto> resource = EntityModel.of(sucursal);
+
+        resource.add(linkTo(methodOn(SucursalController.class).obtenerSucursal(id)).withSelfRel());
+        resource.add(linkTo(methodOn(SucursalController.class).actualizarSucursal(id, sucursal)).withRel("update"));
+        resource.add(linkTo(methodOn(SucursalController.class).cambiarEstadoSucursal(id, !sucursal.getActiva())).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(SucursalController.class).listarSucursales()).withRel("all-sucursales"));
+        resource.add(linkTo(methodOn(SucursalController.class).buscarSucursalesActivas()).withRel("active-sucursales"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -81,7 +110,24 @@ public class SucursalController {
         if (result.hasErrors()) {
             return ResponseEntity.internalServerError().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        List<EntityModel<SucursalDto>> sucursales = result.getData().stream()
+                .map(sucursal -> {
+                    EntityModel<SucursalDto> resource = EntityModel.of(sucursal);
+                    resource.add(linkTo(methodOn(SucursalController.class).obtenerSucursal(sucursal.getId())).withRel("self"));
+                    resource.add(linkTo(methodOn(SucursalController.class).actualizarSucursal(sucursal.getId(), sucursal)).withRel("update"));
+                    resource.add(linkTo(methodOn(SucursalController.class).cambiarEstadoSucursal(sucursal.getId(), !sucursal.getActiva())).withRel("toggle-status"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(SucursalController.class).listarSucursales()).withSelfRel();
+        Link createLink = linkTo(methodOn(SucursalController.class).crearSucursal(new SucursalDto())).withRel("create-sucursal");
+        Link activeLink = linkTo(methodOn(SucursalController.class).buscarSucursalesActivas()).withRel("active-sucursales");
+
+        CollectionModel<EntityModel<SucursalDto>> resources = CollectionModel.of(sucursales, selfLink, createLink, activeLink);
+
+        return ResponseEntity.ok(resources);
     }
 
     @Operation(
@@ -105,7 +151,16 @@ public class SucursalController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        SucursalDto sucursal = result.getData();
+        EntityModel<SucursalDto> resource = EntityModel.of(sucursal);
+
+        resource.add(linkTo(methodOn(SucursalController.class).actualizarSucursal(id, dto)).withSelfRel());
+        resource.add(linkTo(methodOn(SucursalController.class).obtenerSucursal(id)).withRel("self"));
+        resource.add(linkTo(methodOn(SucursalController.class).cambiarEstadoSucursal(id, sucursal.getActiva())).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(SucursalController.class).listarSucursales()).withRel("all-sucursales"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -146,6 +201,21 @@ public class SucursalController {
         if (result.hasErrors()) {
             return ResponseEntity.internalServerError().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        List<EntityModel<SucursalDto>> sucursales = result.getData().stream()
+                .map(sucursal -> {
+                    EntityModel<SucursalDto> resource = EntityModel.of(sucursal);
+                    resource.add(linkTo(methodOn(SucursalController.class).obtenerSucursal(sucursal.getId())).withRel("self"));
+                    resource.add(linkTo(methodOn(SucursalController.class).cambiarEstadoSucursal(sucursal.getId(), false)).withRel("deactivate"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(SucursalController.class).buscarSucursalesActivas()).withSelfRel();
+        Link allLink = linkTo(methodOn(SucursalController.class).listarSucursales()).withRel("all-sucursales");
+
+        CollectionModel<EntityModel<SucursalDto>> resources = CollectionModel.of(sucursales, selfLink, allLink);
+
+        return ResponseEntity.ok(resources);
     }
 }
