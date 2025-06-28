@@ -170,9 +170,9 @@ public class ProductoService {
             errors.add("Error al eliminar producto: " + e.getMessage());
             return new ServiceResult<>(errors);
         }
-        return null;
+        return new ServiceResult<>(errors);
     }
-    private Producto toEntity(ProductoDto dto) throws Exception {
+    public Producto toEntity(ProductoDto dto) throws Exception {
         if (dto == null) return null;
         ProveedorResponse prov=consultarProveedor(dto.getProveedorId());
         //si exite dejalo pasar
@@ -191,7 +191,7 @@ public class ProductoService {
                 .proveedoresId(dto.getProveedorId())
                 .build();
     }
-    private ProductoDto toDto(Producto producto) {
+    public ProductoDto toDto(Producto producto) {
         if (producto == null) return null;
 
         return ProductoDto.builder()

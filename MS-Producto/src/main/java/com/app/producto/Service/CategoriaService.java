@@ -71,7 +71,7 @@ public class CategoriaService {
             errors.add("Error al eliminar categoría: " + e.getMessage());
             return new ServiceResult<>(errors);
         }
-        return null;
+        return new ServiceResult<>(errors);
     }
 
     public ServiceResult<CategoriaDto> actualizarCategoria(Long id, CategoriaDto dto) {

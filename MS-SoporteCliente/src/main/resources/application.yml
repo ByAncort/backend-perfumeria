@@ -20,7 +20,7 @@ auth:
     jwtMicro: http://localhost:9010/api/auth/validate-token
     provMicro: http://localhost:9012
     carritoMicro: http://localhost:9018
-    clienteMicro: http://localhost:9020
+    clienteMicro: http://localhost:9012
 
 logistica:
   codigo:

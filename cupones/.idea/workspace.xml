@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="350cda79-f446-471d-8ca2-f3ddc81fbd92" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../MS-cupones/src/test/java/org/necronet/cupones/CouponServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,6 +101,7 @@
       <updated>1750733374382</updated>
       <workItem from="1750733375521" duration="2327000" />
       <workItem from="1750817614718" duration="595000" />
+      <workItem from="1751065352301" duration="582000" />
     </task>
     <servers />
   </component>

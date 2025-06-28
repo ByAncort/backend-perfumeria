@@ -32,14 +32,14 @@ public class SoporteService {
         List<String> errors = new ArrayList<>();
 
         try {
-            // Validar el cliente
+    
             ServiceResult<ClienteDto> clienteResult = obtenerCliente(request.getClienteId());
             if (clienteResult.hasErrors()) {
                 errors.addAll(clienteResult.getErrors());
                 return new ServiceResult<>(errors);
             }
 
-            // Crear el ticket
+
             TicketSoporte ticket = TicketSoporte.builder()
                     .clienteId(request.getClienteId())
                     .tipo(request.getTipo())
@@ -53,7 +53,7 @@ public class SoporteService {
 
             ticket = ticketRepository.save(ticket);
 
-            // Convertir a DTO con información del cliente
+            
             TicketSoporteDto dto = convertToDto(ticket);
             dto.setClienteInfo(clienteResult.getData());
 
@@ -69,17 +69,17 @@ public class SoporteService {
         List<String> errors = new ArrayList<>();
 
         try {
-            // Obtener información del cliente
+            
             ServiceResult<ClienteDto> clienteResult = obtenerCliente(clienteId);
             if (clienteResult.hasErrors()) {
                 errors.addAll(clienteResult.getErrors());
                 return new ServiceResult<>(errors);
             }
 
-            // Obtener tickets del cliente
+            
             List<TicketSoporte> tickets = ticketRepository.findByClienteId(clienteId);
 
-            // Convertir a DTOs
+            
             List<TicketSoporteDto> dtos = tickets.stream()
                     .map(this::convertToDto)
                     .peek(dto -> dto.setClienteInfo(clienteResult.getData()))
@@ -98,11 +98,11 @@ public class SoporteService {
         List<String> errors = new ArrayList<>();
 
         try {
-            // Buscar el ticket
+            
             TicketSoporte ticket = ticketRepository.findById(ticketId)
                     .orElseThrow(() -> new RuntimeException("Ticket no encontrado"));
 
-            // Actualizar campos
+            
             if (request.getEstado() != null) {
                 ticket.setEstado(request.getEstado());
 
@@ -119,14 +119,14 @@ public class SoporteService {
             ticket.setFechaActualizacion(LocalDateTime.now());
             ticket = ticketRepository.save(ticket);
 
-            // Obtener información del cliente
+            
             ServiceResult<ClienteDto> clienteResult = obtenerCliente(ticket.getClienteId());
             if (clienteResult.hasErrors()) {
                 errors.addAll(clienteResult.getErrors());
                 return new ServiceResult<>(errors);
             }
 
-            // Convertir a DTO
+            
             TicketSoporteDto dto = convertToDto(ticket);
             dto.setClienteInfo(clienteResult.getData());
 
@@ -147,7 +147,7 @@ public class SoporteService {
             List<TicketSoporteDto> dtos = tickets.stream()
                     .map(ticket -> {
                         TicketSoporteDto dto = convertToDto(ticket);
-                        // Obtener información del cliente para cada ticket
+                        
                         ServiceResult<ClienteDto> clienteResult = obtenerCliente(ticket.getClienteId());
                         if (!clienteResult.hasErrors()) {
                             dto.setClienteInfo(clienteResult.getData());
