@@ -10,11 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.necronet.msresenasfeedback.dto.CrearResenaDto;
 import org.necronet.msresenasfeedback.dto.ResenaDto;
+import org.necronet.msresenasfeedback.dto.ResenaProductoDto;
 import org.necronet.msresenasfeedback.service.ResenaService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/resenas")
@@ -36,11 +43,18 @@ public class ResenaController {
                     required = true,
                     content = @Content(schema = @Schema(implementation = CrearResenaDto.class))
             ) CrearResenaDto dto) {
+
         var result = resenaService.crearResena(dto);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        ResenaDto resena = result.getData();
+        EntityModel<ResenaDto> model = EntityModel.of(resena);
+        model.add(linkTo(methodOn(ResenaController.class).obtenerResenasPorProducto(resena.getProductoId())).withRel("resenas-del-producto"));
+        model.add(linkTo(methodOn(ResenaController.class).obtenerTodasResenas()).withRel("todas-las-resenas"));
+
+        return ResponseEntity.ok(model);
     }
 
     @Operation(summary = "Obtener reseñas por producto", description = "Obtiene todas las reseñas asociadas a un producto específico.")
@@ -52,11 +66,25 @@ public class ResenaController {
     public ResponseEntity<?> obtenerResenasPorProducto(
             @Parameter(description = "ID del producto", required = true)
             @PathVariable Long productoId) {
+
         var result = resenaService.obtenerResenasPorProducto(productoId);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        List<EntityModel<ResenaProductoDto>> resenas = result.getData().stream()
+                .map(resena -> EntityModel.of(resena,
+                        linkTo(methodOn(ResenaController.class)
+                                .obtenerResenasPorProducto(resena.getProductoId())).withRel("resenas-del-producto"),
+                        linkTo(methodOn(ResenaController.class)
+                                .obtenerTodasResenas()).withRel("todas-las-resenas")))
+                .collect(Collectors.toList());
+
+
+        CollectionModel<EntityModel<ResenaProductoDto>> collectionModel = CollectionModel.of(resenas);
+        collectionModel.add(linkTo(methodOn(ResenaController.class).obtenerResenasPorProducto(productoId)).withSelfRel());
+
+        return ResponseEntity.ok(collectionModel);
     }
 
     @Operation(summary = "Obtener todas las reseñas", description = "Lista todas las reseñas registradas en el sistema.")
@@ -66,10 +94,21 @@ public class ResenaController {
     })
     @GetMapping
     public ResponseEntity<?> obtenerTodasResenas() {
+
         var result = resenaService.obtenerTodasResenas();
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
-        return ResponseEntity.ok(result.getData());
+
+        List<EntityModel<ResenaDto>> resenas = result.getData().stream()
+                .map(resena -> EntityModel.of(resena,
+                        linkTo(methodOn(ResenaController.class).obtenerResenasPorProducto(resena.getProductoId())).withRel("resenas-del-producto"),
+                        linkTo(methodOn(ResenaController.class).obtenerTodasResenas()).withSelfRel()))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<ResenaDto>> collectionModel = CollectionModel.of(resenas);
+        collectionModel.add(linkTo(methodOn(ResenaController.class).obtenerTodasResenas()).withSelfRel());
+
+        return ResponseEntity.ok(collectionModel);
     }
 }

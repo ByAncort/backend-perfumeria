@@ -7,15 +7,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import lombok.RequiredArgsConstructor;
 import org.app.dto.ServiceResult;
 import org.necronet.mssoportecliente.dto.*;
 import org.necronet.mssoportecliente.service.SoporteService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,14 +38,28 @@ public class SoporteController {
                     content = @Content(schema = @Schema(implementation = ServiceResult.class)))
     })
     @PostMapping("/tickets")
-    public ResponseEntity<ServiceResult<TicketSoporteDto>> crearTicket(
+    public ResponseEntity<?> crearTicket(
             @RequestBody TicketRequest request) {
 
         ServiceResult<TicketSoporteDto> result = soporteService.crearTicket(request);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result);
         }
-        return ResponseEntity.ok(result);
+
+        TicketSoporteDto ticket = result.getData();
+        EntityModel<TicketSoporteDto> resource = EntityModel.of(ticket);
+
+        // Self link
+        resource.add(linkTo(methodOn(SoporteController.class).crearTicket(request)).withSelfRel());
+        // Links relacionados
+        resource.add(linkTo(methodOn(SoporteController.class)
+                .obtenerTicketsPorCliente(ticket.getClienteId())).withRel("tickets-cliente"));
+        resource.add(linkTo(methodOn(SoporteController.class)
+                .actualizarTicket(ticket.getId(), new TicketUpdateRequest())).withRel("update"));
+        resource.add(linkTo(methodOn(SoporteController.class)
+                .obtenerTicketsPorEstado(ticket.getEstado())).withRel("tickets-estado"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(summary = "Obtener tickets por cliente", description = "Devuelve todos los tickets de soporte asociados a un cliente.")
@@ -51,7 +70,7 @@ public class SoporteController {
                     content = @Content(schema = @Schema(implementation = ServiceResult.class)))
     })
     @GetMapping("/tickets/cliente/{clienteId}")
-    public ResponseEntity<ServiceResult<List<TicketSoporteDto>>> obtenerTicketsPorCliente(
+    public ResponseEntity<?> obtenerTicketsPorCliente(
             @Parameter(description = "ID del cliente", required = true)
             @PathVariable Long clienteId) {
 
@@ -59,7 +78,28 @@ public class SoporteController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result);
         }
-        return ResponseEntity.ok(result);
+
+        List<EntityModel<TicketSoporteDto>> tickets = result.getData().stream()
+                .map(ticket -> {
+                    EntityModel<TicketSoporteDto> resource = EntityModel.of(ticket);
+                    resource.add(linkTo(methodOn(SoporteController.class)
+                            .obtenerTicketsPorCliente(clienteId)).withSelfRel());
+                    resource.add(linkTo(methodOn(SoporteController.class)
+                            .actualizarTicket(ticket.getId(), new TicketUpdateRequest())).withRel("update"));
+                    resource.add(linkTo(methodOn(SoporteController.class)
+                            .obtenerTicketsPorEstado(ticket.getEstado())).withRel("tickets-estado"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(SoporteController.class)
+                .obtenerTicketsPorCliente(clienteId)).withSelfRel();
+        Link createLink = linkTo(methodOn(SoporteController.class)
+                .crearTicket(new TicketRequest())).withRel("create-ticket");
+
+        CollectionModel<EntityModel<TicketSoporteDto>> resources = CollectionModel.of(tickets, selfLink, createLink);
+
+        return ResponseEntity.ok(resources);
     }
 
     @Operation(summary = "Actualizar ticket de soporte", description = "Actualiza la información de un ticket de soporte.")
@@ -70,7 +110,7 @@ public class SoporteController {
                     content = @Content(schema = @Schema(implementation = ServiceResult.class)))
     })
     @PutMapping("/tickets/{ticketId}")
-    public ResponseEntity<ServiceResult<TicketSoporteDto>> actualizarTicket(
+    public ResponseEntity<?> actualizarTicket(
             @Parameter(description = "ID del ticket", required = true)
             @PathVariable Long ticketId,
             @RequestBody TicketUpdateRequest request) {
@@ -79,7 +119,20 @@ public class SoporteController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result);
         }
-        return ResponseEntity.ok(result);
+
+        TicketSoporteDto ticket = result.getData();
+        EntityModel<TicketSoporteDto> resource = EntityModel.of(ticket);
+
+        // Self link
+        resource.add(linkTo(methodOn(SoporteController.class)
+                .actualizarTicket(ticketId, request)).withSelfRel());
+        // Links relacionados
+        resource.add(linkTo(methodOn(SoporteController.class)
+                .obtenerTicketsPorCliente(ticket.getClienteId())).withRel("tickets-cliente"));
+        resource.add(linkTo(methodOn(SoporteController.class)
+                .obtenerTicketsPorEstado(ticket.getEstado())).withRel("tickets-estado"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(summary = "Obtener tickets por estado", description = "Filtra los tickets de soporte según su estado.")
@@ -90,7 +143,7 @@ public class SoporteController {
                     content = @Content(schema = @Schema(implementation = ServiceResult.class)))
     })
     @GetMapping("/tickets/estado/{estado}")
-    public ResponseEntity<ServiceResult<List<TicketSoporteDto>>> obtenerTicketsPorEstado(
+    public ResponseEntity<?> obtenerTicketsPorEstado(
             @Parameter(description = "Estado del ticket (ej. ABIERTO, EN_PROCESO, CERRADO)", required = true)
             @PathVariable String estado) {
 
@@ -98,6 +151,27 @@ public class SoporteController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result);
         }
-        return ResponseEntity.ok(result);
+
+        List<EntityModel<TicketSoporteDto>> tickets = result.getData().stream()
+                .map(ticket -> {
+                    EntityModel<TicketSoporteDto> resource = EntityModel.of(ticket);
+                    resource.add(linkTo(methodOn(SoporteController.class)
+                            .obtenerTicketsPorEstado(estado)).withSelfRel());
+                    resource.add(linkTo(methodOn(SoporteController.class)
+                            .actualizarTicket(ticket.getId(), new TicketUpdateRequest())).withRel("update"));
+                    resource.add(linkTo(methodOn(SoporteController.class)
+                            .obtenerTicketsPorCliente(ticket.getClienteId())).withRel("tickets-cliente"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(SoporteController.class)
+                .obtenerTicketsPorEstado(estado)).withSelfRel();
+        Link createLink = linkTo(methodOn(SoporteController.class)
+                .crearTicket(new TicketRequest())).withRel("create-ticket");
+
+        CollectionModel<EntityModel<TicketSoporteDto>> resources = CollectionModel.of(tickets, selfLink, createLink);
+
+        return ResponseEntity.ok(resources);
     }
 }

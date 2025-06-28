@@ -13,10 +13,17 @@ import org.necronet.mslogistica.dto.EnvioDto;
 import org.necronet.mslogistica.dto.RutaOptimizadaDto;
 import org.necronet.mslogistica.dto.SeguimientoResponse;
 import org.necronet.mslogistica.service.LogisticaService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +47,7 @@ public class LogisticaController {
             )
     })
     @PostMapping("/envios")
-    public ResponseEntity<ServiceResult<EnvioDto>> crearEnvio(
+    public ResponseEntity<EntityModel<ServiceResult<EnvioDto>>> crearEnvio(
             @Parameter(description = "ID del pago asociado", required = true) @RequestParam Long pagoId,
             @Parameter(description = "Dirección de envío completa", required = true) @RequestParam String direccionEnvio,
             @Parameter(description = "Ciudad de destino", required = true) @RequestParam String ciudad,
@@ -52,10 +59,16 @@ public class LogisticaController {
         ServiceResult<EnvioDto> result = logisticaService.crearEnvio(pagoId, direccionEnvio, ciudad, provincia, codigoPostal, pais, metodoEnvio);
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result);
+            return ResponseEntity.badRequest().body(EntityModel.of(result));
         }
 
-        return ResponseEntity.ok(result);
+        EntityModel<ServiceResult<EnvioDto>> resource = EntityModel.of(result);
+        String codigo = result.getData().getCodigoSeguimiento();
+        if (codigo != null) {
+            resource.add(linkTo(methodOn(LogisticaController.class).obtenerEstadoEnvio(codigo)).withRel("seguimiento"));
+            resource.add(linkTo(methodOn(LogisticaController.class).actualizarEstadoEnvio(codigo, null)).withRel("actualizar-estado"));
+        }
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(summary = "Obtener estado de envío", description = "Consulta el estado actual de un envío mediante su código de seguimiento")
@@ -72,17 +85,20 @@ public class LogisticaController {
             )
     })
     @GetMapping("/envios/seguimiento/{codigoSeguimiento}")
-    public ResponseEntity<ServiceResult<SeguimientoResponse>> obtenerEstadoEnvio(
+    public ResponseEntity<EntityModel<ServiceResult<SeguimientoResponse>>> obtenerEstadoEnvio(
             @Parameter(description = "Código único de seguimiento del envío", required = true)
             @PathVariable String codigoSeguimiento) {
 
         ServiceResult<SeguimientoResponse> result = logisticaService.obtenerEstadoEnvio(codigoSeguimiento);
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result);
+            return ResponseEntity.badRequest().body(EntityModel.of(result));
         }
 
-        return ResponseEntity.ok(result);
+        EntityModel<ServiceResult<SeguimientoResponse>> resource = EntityModel.of(result);
+        resource.add(linkTo(methodOn(LogisticaController.class).actualizarEstadoEnvio(codigoSeguimiento, null)).withRel("actualizar-estado"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(summary = "Actualizar estado de envío", description = "Actualiza el estado de un envío (PREPARANDO, EN_TRANSITO, ENTREGADO, CANCELADO)")
@@ -99,7 +115,7 @@ public class LogisticaController {
             )
     })
     @PutMapping("/envios/{codigoSeguimiento}/estado")
-    public ResponseEntity<ServiceResult<EnvioDto>> actualizarEstadoEnvio(
+    public ResponseEntity<EntityModel<ServiceResult<EnvioDto>>> actualizarEstadoEnvio(
             @Parameter(description = "Código de seguimiento del envío", required = true)
             @PathVariable String codigoSeguimiento,
 
@@ -108,15 +124,21 @@ public class LogisticaController {
                     required = true,
                     schema = @Schema(allowableValues = {"PREPARANDO", "EN_TRANSITO", "ENTREGADO", "CANCELADO"})
             )
-            @RequestParam String nuevoEstado) {
+            @RequestParam(required = false) String nuevoEstado) { // Nota: null para enlace HATEOAS sin estado
 
         ServiceResult<EnvioDto> result = logisticaService.actualizarEstadoEnvio(codigoSeguimiento, nuevoEstado);
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result);
+            return ResponseEntity.badRequest().body(EntityModel.of(result));
         }
 
-        return ResponseEntity.ok(result);
+        EntityModel<ServiceResult<EnvioDto>> resource = EntityModel.of(result);
+        String codigo = result.getData().getCodigoSeguimiento();
+        if (codigo != null) {
+            resource.add(linkTo(methodOn(LogisticaController.class).obtenerEstadoEnvio(codigo)).withRel("seguimiento"));
+        }
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(summary = "Obtener envíos por usuario", description = "Lista todos los envíos asociados a un usuario específico")
@@ -133,17 +155,34 @@ public class LogisticaController {
             )
     })
     @GetMapping("/envios/usuario/{usuarioId}")
-    public ResponseEntity<ServiceResult<List<EnvioDto>>> obtenerEnviosPorUsuario(
+    public ResponseEntity<CollectionModel<EntityModel<EnvioDto>>> obtenerEnviosPorUsuario(
             @Parameter(description = "ID del usuario", required = true)
             @PathVariable Long usuarioId) {
 
         ServiceResult<List<EnvioDto>> result = logisticaService.obtenerEnviosPorUsuario(usuarioId);
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result);
+            // Para errores, no devolvemos colección sino directamente el error (podrías crear un EntityModel para error si quieres)
+            return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(result);
+        List<EntityModel<EnvioDto>> envios = result.getData().stream()
+                .map(envio -> {
+                    EntityModel<EnvioDto> envioResource = EntityModel.of(envio);
+                    String codigo = envio.getCodigoSeguimiento();
+                    if (codigo != null) {
+                        envioResource.add(linkTo(methodOn(LogisticaController.class).obtenerEstadoEnvio(codigo)).withRel("seguimiento"));
+                        envioResource.add(linkTo(methodOn(LogisticaController.class).actualizarEstadoEnvio(codigo, null)).withRel("actualizar-estado"));
+                    }
+                    return envioResource;
+                })
+                .collect(Collectors.toList());
+
+
+        CollectionModel<EntityModel<EnvioDto>> collectionModel = CollectionModel.of(envios);
+        collectionModel.add(linkTo(methodOn(LogisticaController.class).obtenerEnviosPorUsuario(usuarioId)).withSelfRel());
+
+        return ResponseEntity.ok(collectionModel);
     }
 
     @Operation(summary = "Optimizar ruta de envío", description = "Calcula la ruta optimizada para un envío específico")
@@ -160,16 +199,22 @@ public class LogisticaController {
             )
     })
     @GetMapping("/envios/{envioId}/ruta")
-    public ResponseEntity<ServiceResult<RutaOptimizadaDto>> optimizarRutaEnvio(
+    public ResponseEntity<EntityModel<ServiceResult<RutaOptimizadaDto>>> optimizarRutaEnvio(
             @Parameter(description = "ID del envío", required = true)
             @PathVariable Long envioId) {
 
         ServiceResult<RutaOptimizadaDto> result = logisticaService.optimizarRutaEnvio(envioId);
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result);
+            return ResponseEntity.badRequest().body(EntityModel.of(result));
         }
 
-        return ResponseEntity.ok(result);
+        EntityModel<ServiceResult<RutaOptimizadaDto>> resource = EntityModel.of(result);
+        // Link para obtener info del envío relacionado (si fuera posible agregarlo)
+        String codigo = "sec.00";
+        if (codigo != null) {
+            resource.add(linkTo(methodOn(LogisticaController.class).obtenerEstadoEnvio(codigo)).withRel("seguimiento"));
+        }
+        return ResponseEntity.ok(resource);
     }
 }

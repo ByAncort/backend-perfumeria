@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,6 +22,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/auth/")
@@ -46,9 +49,16 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = AuthResponse.class))
             )
     })
-    @PostMapping(value = "login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    @PostMapping("login")
+    public ResponseEntity<EntityModel<AuthResponse>> login(@RequestBody LoginRequest request) {
+        AuthResponse authResponse = authService.login(request);
+
+        EntityModel<AuthResponse> model = EntityModel.of(authResponse,
+                linkTo(methodOn(AuthController.class).login(request)).withSelfRel(),
+                linkTo(methodOn(AuthController.class).validateToken(new TokenValidationRequest(authResponse.getToken()))).withRel("validate-token")
+        );
+
+        return ResponseEntity.ok(model);
     }
 
     @Operation(
@@ -69,13 +79,19 @@ public class AuthController {
             )
     })
     @PostMapping("validate-token")
-    public ResponseEntity<?> validateToken(@RequestBody TokenValidationRequest request) {
+    public ResponseEntity<EntityModel<TokenValidResponse>> validateToken(@RequestBody TokenValidationRequest request) {
         authService.validateToken(request.getToken());
-        return ResponseEntity.ok(
-                TokenValidResponse.builder()
-                        .message("Token válido")
-                        .build()
+
+        TokenValidResponse response = TokenValidResponse.builder()
+                .message("Token válido")
+                .build();
+
+        EntityModel<TokenValidResponse> model = EntityModel.of(response,
+                linkTo(methodOn(AuthController.class).validateToken(request)).withSelfRel(),
+                linkTo(methodOn(AuthController.class).login(null)).withRel("login")
         );
+
+        return ResponseEntity.ok(model);
     }
 
     @Operation(
@@ -99,17 +115,23 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = AuthResponse.class))
             )
     })
-    @PostMapping(value = "register")
-    public ResponseEntity<AuthResponse> registerUser(@RequestBody RegisterRequest request) {
+    @PostMapping("register")
+    public ResponseEntity<EntityModel<AuthResponse>> registerUser(@RequestBody RegisterRequest request) {
         try {
             AuthResponse response = authService.createUser(request);
-            return ResponseEntity.ok(response);
+
+            EntityModel<AuthResponse> model = EntityModel.of(response,
+                    linkTo(methodOn(AuthController.class).registerUser(request)).withSelfRel(),
+                    linkTo(methodOn(AuthController.class).login(null)).withRel("login")
+            );
+
+            return ResponseEntity.ok(model);
         } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(AuthResponse.builder().message(e.getMessage()).build());
+            AuthResponse error = AuthResponse.builder().message(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(EntityModel.of(error));
         } catch (ServiceException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(AuthResponse.builder().message(e.getMessage()).build());
+            AuthResponse error = AuthResponse.builder().message(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(EntityModel.of(error));
         }
     }
 
@@ -119,7 +141,7 @@ public class AuthController {
             AccessDeniedException.class,
             AuthenticationException.class
     })
-    public ResponseEntity<AuthResponse> handleAuthExceptions(RuntimeException e) {
+    public ResponseEntity<EntityModel<AuthResponse>> handleAuthExceptions(RuntimeException e) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         if (e instanceof AccessDeniedException) {
             status = HttpStatus.FORBIDDEN;
@@ -129,16 +151,25 @@ public class AuthController {
                 .message(e.getMessage())
                 .build();
 
-        return ResponseEntity.status(status).body(errorResponse);
+        EntityModel<AuthResponse> model = EntityModel.of(errorResponse,
+                linkTo(methodOn(AuthController.class).login(null)).withRel("login")
+        );
+
+        return ResponseEntity.status(status).body(model);
     }
 
     @Operation(hidden = true)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<AuthResponse> handleGenericException(Exception e) {
+    public ResponseEntity<EntityModel<AuthResponse>> handleGenericException(Exception e) {
         AuthResponse errorResponse = AuthResponse.builder()
                 .message("Error interno del servidor: " + e.getMessage())
                 .build();
 
-        return ResponseEntity.internalServerError().body(errorResponse);
+        EntityModel<AuthResponse> model = EntityModel.of(errorResponse,
+                linkTo(methodOn(AuthController.class).login(null)).withRel("login"),
+                linkTo(methodOn(AuthController.class).registerUser(null)).withRel("register")
+        );
+
+        return ResponseEntity.internalServerError().body(model);
     }
 }

@@ -10,11 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.app.dto.ServiceResult;
 import org.necronet.mspago.model.Pago;
 import org.necronet.mspago.service.PagoService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/pagos")
@@ -62,8 +69,19 @@ public class PagoController {
             return ResponseEntity.badRequest().body(resultado.getErrors());
         }
 
-        return ResponseEntity.created(URI.create("/api/pagos/" + resultado.getData().getId()))
-                .body(resultado.getData());
+        Pago pago = resultado.getData();
+        EntityModel<Pago> resource = EntityModel.of(pago);
+
+        // Self link
+        resource.add(linkTo(methodOn(PagoController.class).obtenerPago(pago.getId())).withSelfRel());
+
+        // Reembolso link (si aplica)
+        if("COMPLETADO".equals(pago.getEstado())) {
+            resource.add(linkTo(methodOn(PagoController.class).reembolsarPago(pago.getId())).withRel("reembolsar"));
+        }
+
+        return ResponseEntity.created(URI.create("/api/pagos/" + pago.getId()))
+                .body(resource);
     }
 
     @Operation(
@@ -92,7 +110,23 @@ public class PagoController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(resultado.getData());
+        Pago pago = resultado.getData();
+        EntityModel<Pago> resource = EntityModel.of(pago);
+
+        // Self link
+        resource.add(linkTo(methodOn(PagoController.class).obtenerPago(id)).withSelfRel());
+
+        // Reembolso link (si aplica)
+        if("COMPLETADO".equals(pago.getEstado())) {
+            resource.add(linkTo(methodOn(PagoController.class).reembolsarPago(id)).withRel("reembolsar"));
+        }
+
+        // Link to user's payments
+        resource.add(linkTo(methodOn(PagoController.class)
+                .obtenerPagosPorUsuario(pago.getUsuarioId()))
+                .withRel("pagos-usuario"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -122,7 +156,36 @@ public class PagoController {
             return ResponseEntity.badRequest().body(resultado.getErrors());
         }
 
-        return ResponseEntity.ok(resultado.getData());
+        List<EntityModel<Pago>> pagos = resultado.getData().stream()
+                .map(pago -> {
+                    EntityModel<Pago> resource = EntityModel.of(pago);
+                    resource.add(linkTo(methodOn(PagoController.class)
+                            .obtenerPago(pago.getId()))
+                            .withSelfRel());
+
+                    if("COMPLETADO".equals(pago.getEstado())) {
+                        resource.add(linkTo(methodOn(PagoController.class)
+                                .reembolsarPago(pago.getId()))
+                                .withRel("reembolsar"));
+                    }
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<Pago>> resources = CollectionModel.of(pagos);
+
+        // Self link
+        resources.add(linkTo(methodOn(PagoController.class)
+                .obtenerPagosPorUsuario(usuarioId))
+                .withSelfRel());
+
+        // Link to process new payment
+        resources.add(linkTo(methodOn(PagoController.class)
+                .procesarPago(null, null))
+                .withRel("procesar-pago")
+                .expand());
+
+        return ResponseEntity.ok(resources);
     }
 
     @Operation(
@@ -152,6 +215,20 @@ public class PagoController {
             return ResponseEntity.badRequest().body(resultado.getErrors());
         }
 
-        return ResponseEntity.ok(resultado.getData());
+        Pago pago = resultado.getData();
+        EntityModel<Pago> resource = EntityModel.of(pago);
+
+        // Self link
+        resource.add(linkTo(methodOn(PagoController.class).reembolsarPago(id)).withSelfRel());
+
+        // Link to payment details
+        resource.add(linkTo(methodOn(PagoController.class).obtenerPago(id)).withRel("pago"));
+
+        // Link to user's payments
+        resource.add(linkTo(methodOn(PagoController.class)
+                .obtenerPagosPorUsuario(pago.getUsuarioId()))
+                .withRel("pagos-usuario"));
+
+        return ResponseEntity.ok(resource);
     }
 }

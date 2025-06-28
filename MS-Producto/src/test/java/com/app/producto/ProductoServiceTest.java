@@ -53,14 +53,14 @@ class ProductoServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Configuración de categoría
+        
         categoria = Categoria.builder()
                 .id(1L)
                 .nombre("Electrónicos")
                 .descripcion("Productos electrónicos")
                 .build();
 
-        // Configuración de productoDto
+        
         productoDto = ProductoDto.builder()
                 .id(1L)
                 .codigoSku("SKU123")
@@ -74,7 +74,7 @@ class ProductoServiceTest {
                 .categoriaId(1L)
                 .build();
 
-        // Configuración de producto
+        
         producto = Producto.builder()
                 .id(1L)
                 .codigoSku("SKU123")
@@ -88,7 +88,7 @@ class ProductoServiceTest {
                 .categoria(categoria)
                 .build();
 
-        // Configuración de proveedor
+        
         proveedorResponse = ProveedorResponse.builder()
                 .id(1L)
                 .nombre("Proveedor Tech")
@@ -105,7 +105,7 @@ class ProductoServiceTest {
 
     @Test
     void crearProducto_deberiaCrearProductoCorrectamente() {
-        // Arrange
+        
         when(productoRepository.existsByCodigoSku(anyString())).thenReturn(false);
         when(productoRepository.existsBySerial(anyString())).thenReturn(false);
         when(categoriaRepository.findById(anyLong())).thenReturn(Optional.of(categoria));
@@ -122,10 +122,10 @@ class ProductoServiceTest {
 
         when(productoRepository.save(any(Producto.class))).thenReturn(producto);
 
-        // Act
+        
         ServiceResult<ProductoDto> result = productoService.crearProducto(productoDto);
 
-        // Assert
+        
         assertFalse(result.hasErrors());
         assertNotNull(result.getData());
         assertEquals("Laptop", result.getData().getNombre());
@@ -137,7 +137,7 @@ class ProductoServiceTest {
     }
     @Test
     void consultarProveedor_deberiaRetornarProveedorCuandoExiste() {
-        // Arrange
+        
         Long proveedorId = 1L;
         String testToken = "eyJhbGciOiJIUzI1NiJ9.eyJleHBpcmF0aW9uIjoxNzUxMTc3MjE4Mzg4LCJpc3N1ZWRBdCI6MTc1MTA4MDgxODM4OCwic3ViIjoiYWRtaW4iLCJpYXQiOjE3NTEwODA4MTgsImV4cCI6MTc1MTE3NzIxOH0.gbcKLmX16MshzU09Mtx_G8E36iPxU7CgiSGji5Pamjk";
         tokenContext.setToken(testToken);
@@ -149,23 +149,23 @@ class ProductoServiceTest {
                 eq(testToken)))
                 .thenReturn(new ResponseEntity<>(proveedorResponse, HttpStatus.OK));
 
-        // Act
+        
         ProveedorResponse response = productoService.consultarProveedor(proveedorId);
 
-        // Assert
+        
         assertNotNull(response);
         assertEquals(proveedorId, response.getId());
         verify(microserviceClient).enviarConToken(anyString(), eq(HttpMethod.GET), isNull(), eq(ProveedorResponse.class), eq(testToken));
     }
     @Test
     void crearProducto_deberiaRetornarErrorCuandoSkuExiste() {
-        // Arrange
+        
         when(productoRepository.existsByCodigoSku(anyString())).thenReturn(true);
 
-        // Act
+        
         ServiceResult<ProductoDto> result = productoService.crearProducto(productoDto);
 
-        // Assert
+        
         assertTrue(result.hasErrors());
         assertEquals("El SKU ya existe", result.getErrors().get(0));
         verify(productoRepository, never()).save(any(Producto.class));
@@ -173,13 +173,13 @@ class ProductoServiceTest {
 
     @Test
     void listarProductos_deberiaRetornarListaDeProductos() {
-        // Arrange
+        
         when(productoRepository.findAll()).thenReturn(List.of(producto));
 
-        // Act
+        
         ServiceResult<List<ProductoDto>> result = productoService.listarProductos();
 
-        // Assert
+        
         assertFalse(result.hasErrors());
         assertEquals(1, result.getData().size());
         assertEquals("Laptop", result.getData().get(0).getNombre());
@@ -187,28 +187,28 @@ class ProductoServiceTest {
 
     @Test
     void obtenerProducto_deberiaRetornarProductoCuandoExiste() {
-        // Arrange
+        
         Long productoId = 1L;
         when(productoRepository.findById(productoId)).thenReturn(Optional.of(producto));
 
-        // Act
+        
         ServiceResult<ProductoDto> result = productoService.obtenerProducto(productoId);
 
-        // Assert
+        
         assertFalse(result.hasErrors());
         assertEquals("Laptop", result.getData().getNombre());
     }
 
     @Test
     void obtenerProducto_deberiaRetornarErrorCuandoNoExiste() {
-        // Arrange
+        
         Long productoId = 99L;
         when(productoRepository.findById(productoId)).thenReturn(Optional.empty());
 
-        // Act
+        
         ServiceResult<ProductoDto> result = productoService.obtenerProducto(productoId);
 
-        // Assert
+        
         assertTrue(result.hasErrors());
         assertEquals("Producto no encontrado con ID 99", result.getErrors().get(0));
     }
@@ -219,29 +219,29 @@ class ProductoServiceTest {
 
     @Test
     void eliminarProducto_deberiaEliminarProductoCuandoExiste() {
-        // Arrange
+        
         Long productoId = 1L;
         when(productoRepository.existsById(productoId)).thenReturn(true);
         doNothing().when(productoRepository).deleteById(productoId);
 
-        // Act
+        
         ServiceResult<Void> result = productoService.eliminarProducto(productoId);
 
-        // Assert
+        
         assertFalse(result.hasErrors());
         verify(productoRepository).deleteById(productoId);
     }
 
     @Test
     void eliminarProducto_deberiaRetornarErrorCuandoNoExiste() {
-        // Arrange
+        
         Long productoId = 99L;
         when(productoRepository.existsById(productoId)).thenReturn(false);
 
-        // Act
+        
         ServiceResult<Void> result = productoService.eliminarProducto(productoId);
 
-        // Assert
+        
         assertTrue(result.hasErrors());
         assertEquals("Producto con ID 99 no existe", result.getErrors().get(0));
         verify(productoRepository, never()).deleteById(anyLong());
@@ -251,10 +251,10 @@ class ProductoServiceTest {
 
     @Test
     void toDto_deberiaConvertirEntityADtoCorrectamente() {
-        // Act
+        
         ProductoDto result = productoService.toDto(producto);
 
-        // Assert
+        
         assertNotNull(result);
         assertEquals("Laptop", result.getNombre());
         assertEquals(1L, result.getCategoriaId());

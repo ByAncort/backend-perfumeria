@@ -12,14 +12,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.app.dto.ServiceResult;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api/carrito/")
+@RequestMapping("/api/carrito")
 @RequiredArgsConstructor
 @Tag(name = "Gestión de Carrito", description = "API para el manejo del carrito de compras con cupones")
 public class CarroController {
@@ -43,15 +50,24 @@ public class CarroController {
                     content = @Content(schema = @Schema(implementation = ServiceResult.class))
             )
     })
-    @PostMapping("agregar-productos")
+    @PostMapping("/agregar-productos")
     public ResponseEntity<?> agregarProductos(
             @Parameter(description = "Datos de los productos a agregar incluyendo código de cupón opcional", required = true)
             @Valid @RequestBody CarroRequest request) {
 
         ServiceResult<CarroResponse> result = carroService.agregarProductosAlCarro(request);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(result);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        EntityModel<CarroResponse> resource = EntityModel.of(result.getData());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).agregarProductos(request)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).obtenerCarrito(result.getData().getCarroId())).withRel("view-cart"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).aplicarCupon(result.getData().getCarroId(), "{codigoCupon}")).withRel("apply-coupon"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).confirmarCompra(result.getData().getCarroId())).withRel("confirm-purchase"));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(resource);
     }
 
     @Operation(
@@ -82,8 +98,20 @@ public class CarroController {
 
         ServiceResult<?> result = carroService.aplicarCuponACarro(carroId, codigoCupon);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(result);
+        if (result.hasErrors()) {
+            if (result.getErrors().contains("Carro no encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            }
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        EntityModel<?> resource = EntityModel.of(result.getData());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).aplicarCupon(carroId, codigoCupon)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).obtenerCarrito(carroId)).withRel("view-cart"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).confirmarCompra(carroId)).withRel("confirm-purchase"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).vaciarCarrito(carroId)).withRel("clear-cart"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -92,7 +120,7 @@ public class CarroController {
             operationId = "vaciarCarrito"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Carrito vaciado exitosamente"),
+            @ApiResponse(responseCode = "204", description = "Carrito vaciado exitosamente"),
             @ApiResponse(
                     responseCode = "400",
                     description = "Error al vaciar el carrito",
@@ -115,7 +143,7 @@ public class CarroController {
                             HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST)
                     .body(result);
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -131,12 +159,27 @@ public class CarroController {
             )
     })
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<ServiceResult<List<CarroResponse>>> listarPorUsuario(
+    public ResponseEntity<CollectionModel<EntityModel<CarroResponse>>> listarPorUsuario(
             @Parameter(description = "ID del usuario", required = true)
             @PathVariable Long usuarioId) {
 
         ServiceResult<List<CarroResponse>> result = carroService.listarCarrosPorUsuario(usuarioId);
-        return ResponseEntity.ok(result);
+
+        List<EntityModel<CarroResponse>> carritos = result.getData().stream()
+                .map(carro -> {
+                    EntityModel<CarroResponse> resource = EntityModel.of(carro);
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).obtenerCarrito(carro.getCarroId())).withSelfRel());
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).aplicarCupon(carro.getCarroId(), "{codigoCupon}")).withRel("apply-coupon"));
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).confirmarCompra(carro.getCarroId())).withRel("confirm-purchase"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<CarroResponse>> collection = CollectionModel.of(carritos);
+        collection.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).listarPorUsuario(usuarioId)).withSelfRel());
+        collection.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).agregarProductos(null)).withRel("add-products"));
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(
@@ -165,7 +208,15 @@ public class CarroController {
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
         }
-        return ResponseEntity.ok(result);
+
+        EntityModel<CarroResponse> resource = EntityModel.of(result.getData());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).obtenerCarrito(carroId)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).aplicarCupon(carroId, "{codigoCupon}")).withRel("apply-coupon"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).confirmarCompra(carroId)).withRel("confirm-purchase"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).vaciarCarrito(carroId)).withRel("clear-cart"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).listarPorUsuario(result.getData().getUsuarioId())).withRel("user-carts"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -196,7 +247,17 @@ public class CarroController {
 
         ServiceResult<CarroResponse> result = carroService.confirmarCompra(carroId);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(result);
+        if (result.hasErrors()) {
+            if (result.getErrors().contains("Carro no encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            }
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        EntityModel<CarroResponse> resource = EntityModel.of(result.getData());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).confirmarCompra(carroId)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CarroController.class).listarPorUsuario(result.getData().getUsuarioId())).withRel("user-carts"));
+
+        return ResponseEntity.ok(resource);
     }
 }

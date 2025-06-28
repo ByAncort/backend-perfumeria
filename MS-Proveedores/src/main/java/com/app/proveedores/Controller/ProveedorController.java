@@ -13,13 +13,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/ms-inventario/proveedor/")
@@ -41,7 +48,21 @@ public class ProveedorController {
     @PostMapping("create-proveedor")
     public ResponseEntity<?> createProveedor(@RequestBody @Valid ProveedorDto proveedorDto) {
         ServiceResult<Proveedor> result = proveedorService.addProveedor(proveedorDto);
-        return handleServiceResult(result, HttpStatus.CREATED);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        Proveedor proveedor = result.getData();
+        EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+        resource.add(linkTo(methodOn(ProveedorController.class).getProveedorById(proveedor.getId())).withSelfRel());
+        resource.add(linkTo(methodOn(ProveedorController.class).updateProveedor(proveedor.getId(), proveedorDto)).withRel("update"));
+        resource.add(linkTo(methodOn(ProveedorController.class).toggleActivoProveedor(proveedor.getId(), true)).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(ProveedorController.class).deleteProveedor(proveedor.getId())).withRel("delete"));
+        resource.add(linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withRel(IanaLinkRelations.COLLECTION));
+
+        return ResponseEntity
+                .created(linkTo(methodOn(ProveedorController.class).getProveedorById(proveedor.getId())).toUri())
+                .body(resource);
     }
 
     @Operation(
@@ -57,7 +78,25 @@ public class ProveedorController {
     @GetMapping("all-active")
     public ResponseEntity<?> getAllProveedoresActivos() {
         ServiceResult<List<Proveedor>> result = proveedorService.getAllProveedoresActivos();
-        return handleServiceResult(result, HttpStatus.OK);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        List<EntityModel<Proveedor>> proveedores = result.getData().stream()
+                .map(proveedor -> {
+                    EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+                    resource.add(linkTo(methodOn(ProveedorController.class).getProveedorById(proveedor.getId())).withSelfRel());
+                    resource.add(linkTo(methodOn(ProveedorController.class).updateProveedor(proveedor.getId(), new ProveedorDto())).withRel("update"));
+                    resource.add(linkTo(methodOn(ProveedorController.class).toggleActivoProveedor(proveedor.getId(), !proveedor.isActivo())).withRel("toggle-status"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        Link selfLink = linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withSelfRel();
+        Link createLink = linkTo(methodOn(ProveedorController.class).createProveedor(new ProveedorDto())).withRel("create-proveedor");
+
+        CollectionModel<EntityModel<Proveedor>> resources = CollectionModel.of(proveedores, selfLink, createLink);
+        return ResponseEntity.ok(resources);
     }
 
     @Operation(
@@ -75,7 +114,19 @@ public class ProveedorController {
             @Parameter(description = "ID único del proveedor", example = "1", required = true)
             @PathVariable Long id) {
         ServiceResult<Proveedor> result = proveedorService.getProveedorById(id);
-        return handleServiceResult(result, HttpStatus.OK);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        Proveedor proveedor = result.getData();
+        EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+        resource.add(linkTo(methodOn(ProveedorController.class).getProveedorById(id)).withSelfRel());
+        resource.add(linkTo(methodOn(ProveedorController.class).updateProveedor(id, new ProveedorDto())).withRel("update"));
+        resource.add(linkTo(methodOn(ProveedorController.class).toggleActivoProveedor(id, !proveedor.isActivo())).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(ProveedorController.class).deleteProveedor(id)).withRel("delete"));
+        resource.add(linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withRel("all-proveedores"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -94,7 +145,19 @@ public class ProveedorController {
             @PathVariable Long id,
             @RequestBody @Valid ProveedorDto dto) {
         ServiceResult<Proveedor> result = proveedorService.updateProveedor(id, dto);
-        return handleServiceResult(result, HttpStatus.OK);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        Proveedor proveedor = result.getData();
+        EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+        resource.add(linkTo(methodOn(ProveedorController.class).getProveedorById(id)).withSelfRel());
+        resource.add(linkTo(methodOn(ProveedorController.class).updateProveedor(id, dto)).withRel("update"));
+        resource.add(linkTo(methodOn(ProveedorController.class).toggleActivoProveedor(id, !proveedor.isActivo())).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(ProveedorController.class).deleteProveedor(id)).withRel("delete"));
+        resource.add(linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withRel("all-proveedores"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -114,7 +177,19 @@ public class ProveedorController {
             @Parameter(description = "Nuevo estado del proveedor", example = "true", required = true)
             @RequestParam boolean activo) {
         ServiceResult<Proveedor> result = proveedorService.toggleActivoProveedor(id, activo);
-        return handleServiceResult(result, HttpStatus.OK);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        Proveedor proveedor = result.getData();
+        EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+        resource.add(linkTo(methodOn(ProveedorController.class).getProveedorById(id)).withSelfRel());
+        resource.add(linkTo(methodOn(ProveedorController.class).updateProveedor(id, new ProveedorDto())).withRel("update"));
+        resource.add(linkTo(methodOn(ProveedorController.class).toggleActivoProveedor(id, !proveedor.isActivo())).withRel("toggle-status"));
+        resource.add(linkTo(methodOn(ProveedorController.class).deleteProveedor(id)).withRel("delete"));
+        resource.add(linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withRel("all-proveedores"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -132,7 +207,18 @@ public class ProveedorController {
             @Parameter(description = "RUT del proveedor", example = "12345678-9", required = true)
             @PathVariable String rut) {
         ServiceResult<Proveedor> result = proveedorService.getProveedorByRut(rut);
-        return handleServiceResult(result, HttpStatus.OK);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        Proveedor proveedor = result.getData();
+        EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+        resource.add(linkTo(methodOn(ProveedorController.class).getProveedorByRut(rut)).withSelfRel());
+        resource.add(linkTo(methodOn(ProveedorController.class).getProveedorById(proveedor.getId())).withRel("by-id"));
+        resource.add(linkTo(methodOn(ProveedorController.class).updateProveedor(proveedor.getId(), new ProveedorDto())).withRel("update"));
+        resource.add(linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withRel("all-proveedores"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -150,14 +236,15 @@ public class ProveedorController {
             @Parameter(description = "ID único del proveedor", example = "1", required = true)
             @PathVariable Long id) {
         ServiceResult<Proveedor> result = proveedorService.deleteProveedor(id);
-        return handleServiceResult(result, HttpStatus.OK);
-    }
-
-    private ResponseEntity<?> handleServiceResult(ServiceResult<?> result, HttpStatus successStatus) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
-        } else {
-            return ResponseEntity.status(successStatus).body(result.getData());
         }
+
+        Proveedor proveedor = result.getData();
+        EntityModel<Proveedor> resource = EntityModel.of(proveedor);
+        resource.add(linkTo(methodOn(ProveedorController.class).getAllProveedoresActivos()).withRel("all-proveedores"));
+        resource.add(linkTo(methodOn(ProveedorController.class).createProveedor(new ProveedorDto())).withRel("create-proveedor"));
+
+        return ResponseEntity.ok(resource);
     }
 }

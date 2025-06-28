@@ -12,11 +12,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.app.dto.ServiceResult;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/v1/categorias")
@@ -47,7 +54,14 @@ public class CategoriaController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
+            CategoriaDto categoria = result.getData();
+            EntityModel<CategoriaDto> resource = EntityModel.of(categoria);
+            resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).createCategoria(request)).withSelfRel());
+            resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).actualizar(1L, categoria)).withRel("update"));
+            resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).eliminar(1L)).withRel("delete"));
+            resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).listar()).withRel("all-categories"));
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(resource);
         }
     }
 
@@ -71,7 +85,22 @@ public class CategoriaController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getErrors());
         } else {
-            return ResponseEntity.ok().body(result.getData());
+            List<EntityModel<CategoriaDto>> categorias = result.getData().stream()
+                    .map(categoria -> {
+                        EntityModel<CategoriaDto> resource = EntityModel.of(categoria);
+                        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).actualizar(1L, categoria)).withRel("update"));
+                        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).eliminar(1L)).withRel("delete"));
+                        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).listar()).withSelfRel());
+                        return resource;
+                    })
+                    .collect(Collectors.toList());
+
+            Link selfLink = WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).listar()).withSelfRel();
+            Link createLink = WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).createCategoria(null)).withRel("create");
+
+            CollectionModel<EntityModel<CategoriaDto>> resources = CollectionModel.of(categorias, selfLink, createLink);
+
+            return ResponseEntity.ok().body(resources);
         }
     }
 
@@ -100,7 +129,17 @@ public class CategoriaController {
             @Parameter(description = "Datos actualizados de la categoría", required = true)
             @Valid @RequestBody CategoriaDto request) {
         ServiceResult<CategoriaDto> result = categoriaService.actualizarCategoria(id, request);
-        return buildResponse(result, HttpStatus.OK);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getErrors());
+        }
+
+        CategoriaDto categoria = result.getData();
+        EntityModel<CategoriaDto> resource = EntityModel.of(categoria);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).actualizar(id, request)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).eliminar(id)).withRel("delete"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(CategoriaController.class).listar()).withRel("all-categories"));
+
+        return ResponseEntity.ok().body(resource);
     }
 
     @Operation(
@@ -129,12 +168,5 @@ public class CategoriaController {
             return ResponseEntity.badRequest().body(result.getErrors());
         }
         return ResponseEntity.noContent().build();
-    }
-
-    private <T> ResponseEntity<?> buildResponse(ServiceResult<T> result, HttpStatus successStatus) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getErrors());
-        }
-        return ResponseEntity.status(successStatus).body(result.getData());
     }
 }

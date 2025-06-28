@@ -11,10 +11,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.app.dto.ServiceResult;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/inventario")
@@ -36,15 +43,18 @@ public class InventarioController {
             )
     })
     @PostMapping
-    public ResponseEntity<InventarioResponse> registrarInventario(
+    public ResponseEntity<EntityModel<InventarioResponse>> registrarInventario(
             @RequestBody InventarioRequest request) {
-
-
         InventarioResponse response = inventarioService.registrarInventario(request);
 
-        return ResponseEntity.ok(response);
-    }
+        EntityModel<InventarioResponse> resource = EntityModel.of(response);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).registrarInventario(request)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(response.getId())).withRel("self"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).actualizarStock(response.getId(), 0)).withRel("update-stock"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerPorSucursal(response.getSucursal().getId())).withRel("by-sucursal"));
 
+        return ResponseEntity.ok(resource);
+    }
 
     @Operation(
             summary = "Obtener inventario por ID",
@@ -61,10 +71,19 @@ public class InventarioController {
                     content = @Content)
     })
     @GetMapping("/{id}")
-    public ResponseEntity<InventarioResponse> obtenerInventario(
+    public ResponseEntity<EntityModel<InventarioResponse>> obtenerInventario(
             @Parameter(description = "ID del registro de inventario", required = true)
             @PathVariable Long id) {
-        return ResponseEntity.ok(inventarioService.obtenerInventarioPorId(id));
+        InventarioResponse response = inventarioService.obtenerInventarioPorId(id);
+
+        EntityModel<InventarioResponse> resource = EntityModel.of(response);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(id)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).actualizarStock(id, 0)).withRel("update-stock"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).vender(id)).withRel("sell"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerPorSucursal(response.getSucursal().getId())).withRel("by-sucursal"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).transferirStock(response.getProducto().getId(), response.getSucursal().getId(), null, 0)).withRel("transfer"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -78,10 +97,25 @@ public class InventarioController {
                     content = @Content(schema = @Schema(implementation = InventarioResponse.class)))
     })
     @GetMapping("/sucursal/{sucursalId}")
-    public ResponseEntity<List<InventarioResponse>> obtenerPorSucursal(
+    public ResponseEntity<CollectionModel<EntityModel<InventarioResponse>>> obtenerPorSucursal(
             @Parameter(description = "ID de la sucursal", required = true)
             @PathVariable Long sucursalId) {
-        return ResponseEntity.ok(inventarioService.obtenerInventarioPorSucursal(sucursalId));
+        List<InventarioResponse> inventarios = inventarioService.obtenerInventarioPorSucursal(sucursalId);
+
+        List<EntityModel<InventarioResponse>> resources = inventarios.stream()
+                .map(inventario -> {
+                    EntityModel<InventarioResponse> resource = EntityModel.of(inventario);
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(inventario.getId())).withSelfRel());
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).actualizarStock(inventario.getId(), 0)).withRel("update-stock"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<InventarioResponse>> collection = CollectionModel.of(resources);
+        collection.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerPorSucursal(sucursalId)).withSelfRel());
+        collection.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).registrarInventario(null)).withRel("register"));
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(
@@ -99,12 +133,19 @@ public class InventarioController {
                     content = @Content)
     })
     @PatchMapping("/{id}/stock")
-    public ResponseEntity<InventarioResponse> actualizarStock(
+    public ResponseEntity<EntityModel<InventarioResponse>> actualizarStock(
             @Parameter(description = "ID del registro de inventario", required = true)
             @PathVariable Long id,
             @Parameter(description = "Nueva cantidad de stock", required = true)
             @RequestParam Integer cantidad) {
-        return ResponseEntity.ok(inventarioService.actualizarStock(id, cantidad));
+        InventarioResponse response = inventarioService.actualizarStock(id, cantidad);
+
+        EntityModel<InventarioResponse> resource = EntityModel.of(response);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).actualizarStock(id, cantidad)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(id)).withRel("inventory"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).vender(id)).withRel("sell"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -122,7 +163,7 @@ public class InventarioController {
                     content = @Content)
     })
     @PostMapping("/transferencia")
-    public ResponseEntity<InventarioResponse> transferirStock(
+    public ResponseEntity<EntityModel<InventarioResponse>> transferirStock(
             @Parameter(description = "ID del producto", required = true)
             @RequestParam Long productoId,
             @Parameter(description = "ID de la sucursal origen", required = true)
@@ -131,9 +172,15 @@ public class InventarioController {
             @RequestParam Long destinoId,
             @Parameter(description = "Cantidad a transferir", required = true)
             @RequestParam Integer cantidad) {
-        return ResponseEntity.ok(
-                inventarioService.transferirStock(origenId, destinoId, productoId, cantidad)
-        );
+        InventarioResponse response = inventarioService.transferirStock(origenId, destinoId, productoId, cantidad);
+
+        EntityModel<InventarioResponse> resource = EntityModel.of(response);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).transferirStock(productoId, origenId, destinoId, cantidad)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(response.getId())).withRel("inventory"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerPorSucursal(origenId)).withRel("origin-inventory"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerPorSucursal(destinoId)).withRel("destination-inventory"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -147,8 +194,22 @@ public class InventarioController {
                     content = @Content(schema = @Schema(implementation = InventarioResponse.class)))
     })
     @GetMapping("/bajo-stock")
-    public ResponseEntity<List<InventarioResponse>> obtenerProductosBajoStock() {
-        return ResponseEntity.ok(inventarioService.obtenerProductosBajoStockMinimo());
+    public ResponseEntity<CollectionModel<EntityModel<InventarioResponse>>> obtenerProductosBajoStock() {
+        List<InventarioResponse> inventarios = inventarioService.obtenerProductosBajoStockMinimo();
+
+        List<EntityModel<InventarioResponse>> resources = inventarios.stream()
+                .map(inventario -> {
+                    EntityModel<InventarioResponse> resource = EntityModel.of(inventario);
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(inventario.getId())).withSelfRel());
+                    resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).actualizarStock(inventario.getId(), 0)).withRel("update-stock"));
+                    return resource;
+                })
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<InventarioResponse>> collection = CollectionModel.of(resources);
+        collection.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerProductosBajoStock()).withSelfRel());
+
+        return ResponseEntity.ok(collection);
     }
 
     @Operation(
@@ -174,7 +235,13 @@ public class InventarioController {
             return ResponseEntity.badRequest().body(response.getErrors());
         }
 
-        return ResponseEntity.ok(response.getData());
+        InventarioResponse data = response.getData();
+        EntityModel<InventarioResponse> resource = EntityModel.of(data);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).vender(id)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).cancelarventa(id)).withRel("cancel-sale"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(id)).withRel("inventory"));
+
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(
@@ -192,10 +259,16 @@ public class InventarioController {
                     content = @Content)
     })
     @PostMapping("/{id}/cancelar-venta")
-    public ResponseEntity<InventarioResponse> cancelarventa(
+    public ResponseEntity<EntityModel<InventarioResponse>> cancelarventa(
             @Parameter(description = "ID del registro de inventario", required = true)
             @PathVariable Long id) {
         InventarioResponse response = inventarioService.canerlarVenta(id);
-        return ResponseEntity.ok(response);
+
+        EntityModel<InventarioResponse> resource = EntityModel.of(response);
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).cancelarventa(id)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).vender(id)).withRel("sell"));
+        resource.add(WebMvcLinkBuilder.linkTo(methodOn(InventarioController.class).obtenerInventario(id)).withRel("inventory"));
+
+        return ResponseEntity.ok(resource);
     }
 }
