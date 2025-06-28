@@ -51,7 +51,7 @@ public class CarroServiceTest {
     void setUp() {
         faker = new Faker();
 
-        // Configurar datos de prueba comunes
+        
         carroRequest = new CarroRequest();
         carroRequest.setUsuarioId(faker.number().randomNumber());
         carroRequest.setCodigoCupon("DESC20");
@@ -78,7 +78,7 @@ public class CarroServiceTest {
 
     @Test
     void agregarProductosAlCarro_Success() {
-        // Mockear respuestas de servicios externos
+        
         when(microserviceClient.enviarConToken(anyString(), eq(HttpMethod.GET), isNull(), eq(InventarioDto.class), anyString()))
                 .thenReturn(new ResponseEntity<>(inventarioDto, HttpStatus.OK));
 
@@ -87,10 +87,10 @@ public class CarroServiceTest {
 
         when(carroRepository.save(any(Carro.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<CarroResponse> result = carroService.agregarProductosAlCarro(carroRequest);
 
-        // Verificaciones
+        
         assertFalse(result.hasErrors());
         assertNotNull(result.getData());
         assertEquals(carroRequest.getUsuarioId(), result.getData().getUsuarioId());
@@ -102,14 +102,14 @@ public class CarroServiceTest {
 
     @Test
     void agregarProductosAlCarro_ProductoNoDisponible() {
-        // Mockear error al obtener producto
+        
         when(microserviceClient.enviarConToken(anyString(), eq(HttpMethod.GET), isNull(), eq(InventarioDto.class), anyString()))
                 .thenThrow(new RuntimeException("Producto no disponible"));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<CarroResponse> result = carroService.agregarProductosAlCarro(carroRequest);
 
-        // Verificaciones
+        
         assertTrue(result.hasErrors());
         assertEquals(1, result.getErrors().size());
         assertTrue(result.getErrors().get(0).contains("Producto no disponible"));
@@ -117,17 +117,17 @@ public class CarroServiceTest {
 
     @Test
     void agregarProductosAlCarro_StockInsuficiente() {
-        // Configurar producto con stock insuficiente
+        
         inventarioDto.setCantidad(0);
 
-        // Mockear respuestas
+        
         when(microserviceClient.enviarConToken(anyString(), eq(HttpMethod.GET), isNull(), eq(InventarioDto.class), anyString()))
                 .thenReturn(new ResponseEntity<>(inventarioDto, HttpStatus.OK));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<CarroResponse> result = carroService.agregarProductosAlCarro(carroRequest);
 
-        // Verificaciones
+        
         assertTrue(result.hasErrors());
         assertEquals(1, result.getErrors().size());
         assertTrue(result.getErrors().get(0).contains("Stock insuficiente"));
@@ -135,21 +135,21 @@ public class CarroServiceTest {
 
     @Test
     void aplicarCuponACarro_Success() {
-        // Configurar datos de prueba
+        
         Long carroId = faker.number().randomNumber();
         String codigoCupon = "DESC20";
         Carro carroExistente = crearCarroDePrueba(carroId, "ACTIVO");
 
-        // Mockear respuestas
+        
         when(carroRepository.findById(carroId)).thenReturn(Optional.of(carroExistente));
         when(microserviceClient.enviarConToken(contains("coupons"), eq(HttpMethod.GET), isNull(), eq(CouponDto.class), anyString()))
                 .thenReturn(new ResponseEntity<>(couponDto, HttpStatus.OK));
         when(carroRepository.save(any(Carro.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<?> result = carroService.aplicarCuponACarro(carroId, codigoCupon);
 
-        // Verificaciones
+        
         assertFalse(result.hasErrors());
         assertTrue(result.getData() instanceof CarroResponse);
         CarroResponse response = (CarroResponse) result.getData();
@@ -159,17 +159,17 @@ public class CarroServiceTest {
 
     @Test
     void aplicarCuponACarro_CarroNoEncontrado() {
-        // Configurar datos de prueba
+        
         Long carroId = faker.number().randomNumber();
         String codigoCupon = "DESC20";
 
-        // Mockear respuestas
+        
         when(carroRepository.findById(carroId)).thenReturn(Optional.empty());
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<?> result = carroService.aplicarCuponACarro(carroId, codigoCupon);
 
-        // Verificaciones
+        
         assertTrue(result.hasErrors());
         assertEquals(1, result.getErrors().size());
         assertTrue(result.getErrors().get(0).contains("Carro no encontrado"));
@@ -177,18 +177,18 @@ public class CarroServiceTest {
 
     @Test
     void aplicarCuponACarro_CarroCompletado() {
-        // Configurar datos de prueba
+        
         Long carroId = faker.number().randomNumber();
         String codigoCupon = "DESC20";
         Carro carroExistente = crearCarroDePrueba(carroId, "COMPLETADO");
 
-        // Mockear respuestas
+        
         when(carroRepository.findById(carroId)).thenReturn(Optional.of(carroExistente));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<?> result = carroService.aplicarCuponACarro(carroId, codigoCupon);
 
-        // Verificaciones
+        
         assertTrue(result.hasErrors());
         assertEquals(1, result.getErrors().size());
         assertTrue(result.getErrors().get(0).contains("No se puede aplicar cupón a un carro completado"));
@@ -196,18 +196,18 @@ public class CarroServiceTest {
 
     @Test
     void vaciarCarro_Success() {
-        // Configurar datos de prueba
+        
         Long carroId = faker.number().randomNumber();
         Carro carroExistente = crearCarroDePrueba(carroId, "ACTIVO");
 
-        // Mockear respuestas
+        
         when(carroRepository.findById(carroId)).thenReturn(Optional.of(carroExistente));
         when(carroRepository.save(any(Carro.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<Void> result = carroService.vaciarCarro(carroId);
 
-        // Verificaciones
+        
         assertFalse(result.hasErrors());
         verify(carroRepository, times(1)).save(argThat(carro ->
                 "VACIO".equals(carro.getEstado()) &&
@@ -218,40 +218,40 @@ public class CarroServiceTest {
 
     @Test
     void listarCarrosPorUsuario_Success() {
-        // Configurar datos de prueba
+        
         Long usuarioId = faker.number().randomNumber();
         List<Carro> carros = Arrays.asList(
                 crearCarroDePrueba(faker.number().randomNumber(), "ACTIVO"),
                 crearCarroDePrueba(faker.number().randomNumber(), "COMPLETADO")
         );
 
-        // Mockear respuestas
+        
         when(carroRepository.findByUsuarioId(usuarioId)).thenReturn(carros);
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<List<CarroResponse>> result = carroService.listarCarrosPorUsuario(usuarioId);
 
-        // Verificaciones
+        
         assertFalse(result.hasErrors());
         assertEquals(2, result.getData().size());
     }
 
     @Test
     void confirmarCompra_Success() {
-        // Configurar datos de prueba
+        
         Long carroId = faker.number().randomNumber();
         Carro carroExistente = crearCarroDePrueba(carroId, "ACTIVO");
 
-        // Mockear respuestas
+        
         when(carroRepository.findById(carroId)).thenReturn(Optional.of(carroExistente));
         when(microserviceClient.enviarConToken(anyString(), eq(HttpMethod.POST), isNull(), eq(InventarioResponse.class), anyString()))
                 .thenReturn(new ResponseEntity<>(new InventarioResponse(), HttpStatus.OK));
         when(carroRepository.save(any(Carro.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<CarroResponse> result = carroService.confirmarCompra(carroId);
 
-        // Verificaciones
+        
         assertFalse(result.hasErrors());
         assertEquals("COMPLETADO", result.getData().getEstado());
         verify(microserviceClient, times(carroExistente.getDetalles().size()))
@@ -260,18 +260,18 @@ public class CarroServiceTest {
 
     @Test
     void confirmarCompra_CarroVacio() {
-        // Configurar datos de prueba
+        
         Long carroId = faker.number().randomNumber();
         Carro carroExistente = crearCarroDePrueba(carroId, "ACTIVO");
-        carroExistente.getDetalles().clear(); // Vaciar detalles
+        carroExistente.getDetalles().clear(); 
 
-        // Mockear respuestas
+        
         when(carroRepository.findById(carroId)).thenReturn(Optional.of(carroExistente));
 
-        // Ejecutar método bajo prueba
+        
         ServiceResult<CarroResponse> result = carroService.confirmarCompra(carroId);
 
-        // Verificaciones
+        
         assertTrue(result.hasErrors());
         assertEquals(1, result.getErrors().size());
         assertTrue(result.getErrors().get(0).contains("No se puede confirmar un carro vacío"));

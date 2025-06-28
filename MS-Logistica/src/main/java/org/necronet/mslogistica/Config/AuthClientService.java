@@ -5,7 +5,7 @@ import org.necronet.mslogistica.Config.Dto.TokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -38,7 +38,7 @@ public class AuthClientService {
 
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new BadCredentialsException("Token inválido");
+                throw new RuntimeException("Token inválido");
             }
             throw new RuntimeException("Error de comunicación con el servicio de autenticación");
         }

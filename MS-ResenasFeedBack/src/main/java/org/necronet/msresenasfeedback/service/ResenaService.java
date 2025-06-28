@@ -33,7 +33,7 @@ public class ResenaService {
     @Value("${auth.url.clienteMicro}")
     private String CLIENTE_SERVICE_URL;
 
-    private ServiceResult<ProductoDto> obtenerProducto(Long productoId) {
+    public ServiceResult<ProductoDto> obtenerProducto(Long productoId) {
         List<String> errors = new ArrayList<>();
         try {
             String token = TokenContext.getToken();
@@ -56,7 +56,7 @@ public class ResenaService {
         }
     }
 
-    private ServiceResult<ClienteDto> obtenerCliente(Long clienteId) {
+    public ServiceResult<ClienteDto> obtenerCliente(Long clienteId) {
         List<String> errors = new ArrayList<>();
         try {
             String token = TokenContext.getToken();

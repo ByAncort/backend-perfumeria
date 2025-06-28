@@ -11,8 +11,8 @@
     <groupId>org.necronet</groupId>
     <artifactId>MS-Logistica</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MS-Logistica2</name>
-    <description>MS-Logistica2</description>
+    <name>MS-Logistica</name>
+    <description>MS-Logistica</description>
     <url/>
     <licenses>
         <license/>
@@ -34,11 +34,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>com.mysql</groupId>

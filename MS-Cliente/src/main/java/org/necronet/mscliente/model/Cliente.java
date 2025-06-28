@@ -2,6 +2,8 @@ package org.necronet.mscliente.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,10 +17,10 @@ public class Cliente {
     private String apellido;
     private String dni;
     private String email;
-    private String segmento; // Ej: "PREMIUM", "STANDARD", "BASIC"
+    private String segmento; 
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    private List<Contacto> contactos;
+    private List<Contacto> contactos = new ArrayList<>();
 
     @OneToMany(mappedBy = "cliente")
     private List<Compra> compras;

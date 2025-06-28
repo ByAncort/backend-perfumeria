@@ -245,7 +245,7 @@ public class LogisticaService {
         }
     }
 
-    private String generarCodigoSeguimiento() {
+    public String generarCodigoSeguimiento() {
         return CODIGO_SEGUIMIENTO_PREFIJO +
                 UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
     }
