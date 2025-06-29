@@ -1,147 +1,293 @@
-# System Overview  
-  
-Este documento proporciona una visión general del sistema Perfumeria Backend, una arquitectura basada en microservicios diseñada para soportar un negocio de venta de perfumes. El sistema está compuesto por múltiples microservicios especializados que trabajan juntos para proporcionar funcionalidad integral para gestión de inventario, procesamiento de ventas, administración de usuarios y más.  
-  
-## Arquitectura del Sistema  
-  
-El Perfumeria Backend implementa un patrón de arquitectura de microservicios con autenticación JWT centralizada y comunicación basada en REST entre servicios. El sistema está diseñado para el mercado chileno con características especializadas como validación de RUT.  
-  
-### Microservicios  
-  
-| Microservicio | Puerto | Responsabilidad Principal | Características Clave |  
-|---------------|--------|---------------------------|----------------------|  
-| MS-Authenticacion | 9010 | Autenticación, generación y validación de tokens | Tokens JWT, login/registro |  
-| MS-Usuarios | 9011 | Gestión de usuarios, roles y permisos | Sistema RBAC con roles/permisos |  
-| MS-Ventas | 9013 | Procesamiento y gestión de ventas | Procesamiento de transacciones, cancelación de ventas |  
-| MS-Proveedores | 9014 | Gestión de proveedores/suministradores | **Validación de RUT chileno**, CRUD de proveedores |  
-| MS-Productos | 9015 | Gestión de catálogo de productos | Productos, categorías, gestión de SKU |  
-| MS-Sucursales | 9016 | Gestión de sucursales/tiendas | Ubicaciones de tiendas, horarios de operación |  
-| MS-Inventario | 9017 | Seguimiento de inventario entre sucursales | Gestión de stock, transferencias, alertas de stock bajo |  
-  
-## Autenticación y Seguridad  
-  
-El sistema utiliza un mecanismo de autenticación basado en JWT. MS-Auth genera tokens al iniciar sesión, que luego son validados por otros microservicios al procesar solicitudes.  
-##
+Basándome en el código del repositorio `ByAncort/backend-perfumeria`, aquí tienes el System Overview completo actualizado con todos los componentes y diagramas de arquitectura:
+
+# System Overview
+
+Este documento proporciona una visión general del sistema Perfumeria Backend, una arquitectura basada en microservicios diseñada para soportar un negocio de venta de perfumes. El sistema está compuesto por múltiples microservicios especializados que trabajan juntos para proporcionar funcionalidad integral para gestión de inventario, procesamiento de ventas, administración de usuarios y más. [1](#3-0) 
+
+## Arquitectura General del Sistema
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        WEB[Web Application]
+        MOBILE[Mobile App]
+        API_GW[API Gateway]
+    end
+    
+    subgraph "Authentication & Security"
+        AUTH[MS-Authenticacion:9010]
+        USERS[MS-Usuarios:9011]
+    end
+    
+    subgraph "Core Business Services"
+        PROD[MS-Productos:9015]
+        PROV[MS-Proveedores:9014]
+        SUC[MS-Sucursales:9016]
+        INV[MS-Inventario:9017]
+    end
+    
+    subgraph "E-commerce Services"
+        CLIENT[MS-Cliente:9012]
+        CART[MS-Carrito:9018]
+        COUPON[MS-cupones:9022]
+        SALES[MS-Ventas:9013]
+    end
+    
+    subgraph "Operations Services"
+        PAY[MS-Pago:9019]
+        SUPPORT[MS-SoporteCliente:9020]
+        REVIEW[MS-ResenasFeedBack:9021]
+    end
+    
+    subgraph "Data Layer"
+        DB[(MySQL Database<br/>perfumalandia_spa)]
+    end
+    
+    WEB --> API_GW
+    MOBILE --> API_GW
+    API_GW --> AUTH
+    
+    AUTH -.->|JWT Validation| USERS
+    AUTH -.->|JWT Validation| PROD
+    AUTH -.->|JWT Validation| PROV
+    AUTH -.->|JWT Validation| SUC
+    AUTH -.->|JWT Validation| INV
+    AUTH -.->|JWT Validation| CLIENT
+    AUTH -.->|JWT Validation| CART
+    AUTH -.->|JWT Validation| COUPON
+    AUTH -.->|JWT Validation| SALES
+    AUTH -.->|JWT Validation| PAY
+    AUTH -.->|JWT Validation| SUPPORT
+    AUTH -.->|JWT Validation| REVIEW
+    
+    CART --> INV
+    CART --> COUPON
+    CART --> PAY
+    SALES --> INV
+    SALES --> PROD
+    SUPPORT --> CLIENT
+    REVIEW --> PROD
+    REVIEW --> CLIENT
+    
+    AUTH --> DB
+    USERS --> DB
+    PROD --> DB
+    PROV --> DB
+    SUC --> DB
+    INV --> DB
+    CLIENT --> DB
+    CART --> DB
+    COUPON --> DB
+    SALES --> DB
+    PAY --> DB
+    SUPPORT --> DB
+    REVIEW --> DB
+```
+
+## Stack Tecnológico
+
+```mermaid
+graph TB
+    subgraph "Backend Framework"
+        SPRING[Spring Boot 3.5.3]
+        JAVA[Java 21]
+        MAVEN[Maven Build Tool]
+    end
+    
+    subgraph "Security & Authentication"
+        JWT[JWT Tokens v0.12.6]
+        SPRING_SEC[Spring Security]
+    end
+    
+    subgraph "Communication & Integration"
+        REST[REST APIs]
+        HATEOAS[Spring HATEOAS v2.5.1]
+        OPENAPI[OpenAPI/Swagger v2.8.9]
+        HTTP[HTTP Client - RestTemplate]
+    end
+    
+    subgraph "Resilience & Performance"
+        CIRCUIT[Resilience4j v2.3.0]
+        CACHE[Spring Cache v3.5.0]
+    end
+    
+    subgraph "Data Layer"
+        MYSQL[MySQL Database]
+        JPA[Spring Data JPA]
+        HIBERNATE[Hibernate ORM]
+    end
+    
+    SPRING --> JAVA
+    SPRING --> JWT
+    SPRING --> REST
+    SPRING --> JPA
+    REST --> HATEOAS
+    REST --> OPENAPI
+    CIRCUIT --> CACHE
+    JPA --> MYSQL
+```
+
+## Arquitectura de Microservicios
+
+### Microservicios Actualizados
+
+| Microservicio | Puerto | Responsabilidad Principal | Características Clave |
+|---------------|--------|---------------------------|----------------------|
+| MS-Authenticacion | 9010 | Autenticación, generación y validación de tokens | Tokens JWT, login/registro |
+| MS-Usuarios | 9011 | Gestión de usuarios, roles y permisos | Sistema RBAC con roles/permisos |
+| MS-Cliente | 9012 | Gestión de datos y perfiles de clientes | CRUD de clientes, validación de datos |
+| MS-Ventas | 9013 | Procesamiento y gestión de ventas | Procesamiento de transacciones, cancelación de ventas |
+| MS-Proveedores | 9014 | Gestión de proveedores/suministradores | **Validación de RUT chileno**, CRUD de proveedores |
+| MS-Productos | 9015 | Gestión de catálogo de productos | Productos, categorías, gestión de SKU, Circuit Breaker |
+| MS-Sucursales | 9016 | Gestión de sucursales/tiendas | Ubicaciones de tiendas, horarios de operación |
+| MS-Inventario | 9017 | Seguimiento de inventario entre sucursales | Gestión de stock, transferencias, alertas de stock bajo |
+| **MS-Carrito** | **9018** | **Gestión de carrito de compras** | **Estados de carrito, cupones, HATEOAS** |
+| **MS-Pago** | **9019** | **Procesamiento de pagos y reembolsos** | **Múltiples métodos de pago, HATEOAS** |
+| **MS-SoporteCliente** | **9020** | **Sistema de tickets de soporte** | **Gestión de tickets, integración con clientes** |
+| **MS-ResenasFeedBack** | **9021** | **Sistema de reseñas y feedback** | **Validación dual de productos y clientes** |
+| **MS-cupones** | **9022** | **Gestión de cupones y descuentos** | **Cupones porcentuales y fijos** | [2](#3-1) 
+
+## Patrón de Comunicación Entre Servicios
+
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant MS_Auth as MS-Auth
-    participant Other_MS as Other Microservices
-    participant AuthClientService
-
-    Client->>MS_Auth: POST /api/auth/login
-    MS_Auth-->>Client: JWT token
+    participant Client as "Cliente/Frontend"
+    participant AuthMS as "MS-Authenticacion"
+    participant ServiceA as "Servicio Origen<br/>(ej: MS-Carrito)"
+    participant ServiceB as "Servicio Destino<br/>(ej: MS-Inventario)"
+    participant TokenCtx as "TokenContext"
+    participant MicroClient as "MicroserviceClient"
     
-    Client->>Other_MS: API Request with JWT Token
-    Other_MS->>AuthClientService: validateToken(token)
-    AuthClientService->>MS_Auth: POST /api/auth/validate-token
-    MS_Auth-->>AuthClientService: Validation Response
+    Note over Client,MicroClient: Flujo de Autenticación
+    Client->>AuthMS: "POST /api/auth/login"
+    AuthMS-->>Client: "JWT Token"
     
-    alt Valid Token
-        AuthClientService-->>Other_MS: Token validity result
-        Other_MS->>Other_MS: Process Request
-        Other_MS-->>Client: Return Result
-    else Invalid Token
-        AuthClientService-->>Other_MS: Token validity result
-        Other_MS-->>Client: 401 Unauthorized
+    Note over Client,MicroClient: Llamada a Servicio con Comunicación Inter-Servicio
+    Client->>ServiceA: "API Request + Bearer Token"
+    ServiceA->>AuthMS: "Validar Token"
+    AuthMS-->>ServiceA: "Token Válido"
+    
+    ServiceA->>TokenCtx: "setToken(jwt)"
+    ServiceA->>ServiceA: "Lógica de Negocio"
+    
+    alt "Necesita datos de otro servicio"
+        ServiceA->>TokenCtx: "getToken()"
+        TokenCtx-->>ServiceA: "JWT Token"
+        ServiceA->>MicroClient: "enviarConToken(url, method, body, class, token)"
+        MicroClient->>ServiceB: "HTTP Request + Authorization: Bearer {token}"
+        ServiceB->>AuthMS: "Validar Token"
+        AuthMS-->>ServiceB: "Token Válido"
+        ServiceB->>ServiceB: "Procesar Request"
+        ServiceB-->>MicroClient: "ServiceResult<T>"
+        MicroClient-->>ServiceA: "ResponseEntity<T>"
     end
+    
+    ServiceA-->>Client: "ServiceResult con datos combinados"
 ```
 
-Cada microservicio autentica las solicitudes de API validando el token JWT con el servicio MS-Auth a través de un componente `AuthClientService`.  
-  
-## Comunicación Entre Servicios  
-  
-Los microservicios se comunican entre sí utilizando llamadas a la API REST facilitadas por `RestTemplate` de Spring. La comunicación mantiene el contexto de seguridad pasando el token JWT entre servicios.  
+Los componentes clave para la comunicación entre servicios son:
+- `TokenContext`: Almacena y proporciona el token JWT actual
+- `MicroserviceClient`: Un wrapper alrededor de RestTemplate que agrega el token a las solicitudes
+- `ServiceResult<T>`: Un wrapper de respuesta estandarizado que incluye datos o información de error [3](#3-2) 
 
-  ```mermaid
+## Nuevos Servicios de E-commerce
+
+### MS-Carrito (Puerto 9018)
+Servicio de carrito de compras con integración completa de cupones y validación de inventario.
+
+**Características principales:**
+- Estados de carrito: ACTIVO, VACIO, COMPLETADO, ABANDONADO [4](#3-3) 
+- Integración con MS-Inventario para validación de stock [5](#3-4) 
+- Soporte completo para cupones de descuento [6](#3-5) 
+- APIs HATEOAS para navegación de recursos [7](#3-6) 
+
+### MS-Pago (Puerto 9019)
+Servicio de procesamiento de pagos con soporte para múltiples métodos de pago y reembolsos.
+
+**Características principales:**
+- Métodos de pago: TARJETA_CREDITO, PAYPAL, TRANSFERENCIA [8](#3-7) 
+- Sistema de reembolsos [9](#3-8) 
+- Validación de carritos antes del pago
+- APIs HATEOAS completas con enlaces condicionales
+
+### MS-SoporteCliente (Puerto 9020)
+Sistema de tickets de soporte al cliente con integración a datos de clientes. [10](#3-9) 
+
+**Características principales:**
+- Gestión completa de tickets de soporte
+- Validación de clientes con MS-Cliente [11](#3-10) 
+- Estados de tickets y seguimiento
+- Integración JWT para seguridad
+
+## Patrones de Diseño Implementados
+
+### 1. Circuit Breaker Pattern [12](#3-11) 
+
+```mermaid
+stateDiagram-v2
+    [*] --> Closed: "Servicio funcionando"
+    Closed --> Open: "Fallas >= threshold"
+    Open --> HalfOpen: "Timeout alcanzado"
+    HalfOpen --> Closed: "Request exitoso"
+    HalfOpen --> Open: "Request falla"
+    
+    Closed: Requests pasan normalmente
+    Open: Requests fallan rápidamente
+    HalfOpen: Permite requests de prueba
+```
+
+### 2. HATEOAS Pattern
+
+```mermaid
+graph LR
+    Resource[EntityModel Resource] --> SelfLink[Self Link]
+    Resource --> RelatedLinks[Related Links]
+    Resource --> ConditionalLinks[Conditional Links]
+    
+    SelfLink --> |"withSelfRel()"| SelfRef[Self Reference]
+    RelatedLinks --> |"withRel('view-cart')"| ViewCart[View Cart]
+    RelatedLinks --> |"withRel('apply-coupon')"| ApplyCoupon[Apply Coupon]
+    ConditionalLinks --> |"if(estado == 'COMPLETADO')"| Reembolso[Reembolso Link]
+```
+
+## Flujo de Negocio: Proceso de Compra Completo
+
+```mermaid
 sequenceDiagram
-    box Calling Service (e.g. MS-Ventas)
-        participant BusinessLogic
-        participant VentaService as VentaService (26-79)
-        participant MicroserviceClient
-        participant TokenContext
+    participant Cliente
+    participant MSCarrito as "MS-Carrito"
+    participant MSInventario as "MS-Inventario"
+    participant MSCupones as "MS-cupones"
+    participant MSPago as "MS-Pago"
+    
+    Cliente->>MSCarrito: "Agregar productos al carrito"
+    MSCarrito->>MSInventario: "Validar stock disponible"
+    MSInventario-->>MSCarrito: "Stock confirmado"
+    
+    opt "Aplicar cupón"
+        Cliente->>MSCarrito: "Aplicar código de cupón"
+        MSCarrito->>MSCupones: "Validar cupón"
+        MSCupones-->>MSCarrito: "Cupón válido + descuento"
+        MSCarrito->>MSCarrito: "Calcular precio final"
     end
-    box Called Service (e.g. MS-Inventario)
-        participant InventoryAPI
-    end
-
-    BusinessLogic->>VentaService: initiateRequest()
-    VentaService->>TokenContext: getCurrentToken()
-    TokenContext-->>VentaService: JWT
-    VentaService->>MicroserviceClient: executeWithToken()
-    MicroserviceClient->>InventoryAPI: HTTP Request<br>(Authorization: Bearer {token})
-    InventoryAPI-->>MicroserviceClient: ServiceResult<T>
-    MicroserviceClient-->>VentaService: parsedResponse
-    VentaService-->>BusinessLogic: ServiceResult<InventoryData>
+    
+    Cliente->>MSCarrito: "Confirmar carrito"
+    MSCarrito->>MSCarrito: "Estado: ACTIVO → COMPLETADO"
+    
+    Cliente->>MSPago: "Procesar pago"
+    MSPago->>MSPago: "Validar método de pago"
+    MSPago->>MSInventario: "Reducir stock"
+    MSInventario-->>MSPago: "Stock actualizado"
+    MSPago-->>Cliente: "Pago confirmado"
 ```
 
-Los componentes clave para la comunicación entre servicios son:  
-- `TokenContext`: Almacena y proporciona el token JWT actual  
-- `MicroserviceClient`: Un wrapper alrededor de RestTemplate que agrega el token a las solicitudes  
-- `ServiceResult<T>`: Un wrapper de respuesta estandarizado que incluye datos o información de error  
-  
-## Procesos de Negocio Principales  
-  
-### Proceso de Ventas  
-  
-El proceso de ventas abarca múltiples microservicios, demostrando cómo trabajan juntos:  
-  
-1. **Crear Venta**: El cliente envía una solicitud de venta a MS-Ventas  
-2. **Validación**: Para cada producto en la venta:  
-   - MS-Ventas obtiene información de inventario de MS-Inventario  
-   - MS-Ventas obtiene detalles del producto de MS-Productos  
-   - MS-Ventas reduce el inventario en MS-Inventario  
-3. **Confirmación**: MS-Ventas crea el registro de venta y confirma al cliente  
-4. **Cancelación** (opcional): Si se cancela la venta:  
-   - MS-Ventas restaura el inventario para cada producto  
-   - MS-Ventas actualiza el estado de la venta a ANULADA  
-  
-## Contexto de Negocio Chileno y Validación de RUT  
-  
-El sistema está específicamente diseñado para el mercado chileno, con MS-Proveedores implementando validación sofisticada de RUT (Rol Único Tributario) chileno. El `ProveedorService` incluye:  
-  
-- **Validación de Patrón de RUT**: Usa regex `^\\d{1,8}-[\\dkK]$` para validar formato  
-- **Algoritmo de Suma de Verificación**: Implementa el cálculo del dígito verificador de RUT chileno  
-- **Normalización**: Elimina caracteres de formato y estandariza la entrada  
-  
-La validación incluye verificaciones de RUT duplicado usando `ProveedorRepository.existsByRut()` para asegurar el registro único de proveedores.  
-  
-## Patrón ServiceResult  
-  
-El sistema implementa un patrón de respuesta estandarizado a través de la clase `ServiceResult<T>`, que proporciona manejo consistente de errores en todos los servicios.  
-  
-El patrón se implementa consistentemente en todos los servicios, con controladores usando un método `handleServiceResult()` para convertir `ServiceResult<T>` en respuestas HTTP apropiadas.  
-  
-## APIs y Puertos de Comunicación  
-  
-Cada microservicio expone una API REST en su puerto designado:  
-  
-| Microservicio | Puerto | Ruta Base API | Endpoints Clave |  
-|---------------|--------|---------------|-----------------|  
-| MS-Authenticacion | 9010 | `/api/auth` | `POST /login`, `POST /register`, `POST /validate-token` |  
-| MS-Usuarios | 9011 | `/api/roles` | `GET /all`, `POST /create`, `PUT /{role}/assign-permission/{permission}` |  
-| MS-Ventas | 9013 | `/api/ventas` | `POST /`, `PATCH /{id}/anular`, `GET /listar-ventas` |  
-| MS-Proveedores | 9014 | `/api/ms-inventario/proveedor` | `POST /create-proveedor`, `GET /by-rut/{rut}`, `PATCH /toggle-activo/{id}` |  
-| MS-Productos | 9015 | `/api/productos` | `POST /create`, `GET /list`, `PUT /update/{id}` |  
-| MS-Sucursales | 9016 | `/api/sucursales` | `POST /`, `GET /activas`, `PATCH /{id}/estado` |  
-| MS-Inventario | 9017 | `/api/inventario` | `POST /`, `POST /transferencia`, `POST /{id}/vender`, `GET /bajo-stock` |  
-  
-## Modelo de Datos  
-  
-El sistema utiliza un modelo de datos distribuido donde cada microservicio gestiona sus propios datos específicos del dominio. Las relaciones clave de entidades incluyen:  
-  
-- **USUARIO** tiene **ROL** que contiene **PERMISO**  
-- **PRODUCTO** se almacena en **INVENTARIO** que está en **SUCURSAL**  
-- **PROVEEDOR** suministra **PRODUCTO**  
-- **VENTA** contiene **DETALLE_VENTA** que incluye **INVENTARIO**  
-- **CLIENTE** hace **VENTA** que se procesa en **SUCURSAL**  
-  
-## Tecnologías Utilizadas  
-  
-- **Framework**: Spring Boot 3.4.5  
-- **Base de Datos**: MySQL  
-- **Autenticación**: JWT (JSON Web Tokens)  
-- **Documentación API**: OpenAPI/Swagger  
-- **Comunicación**: REST APIs  
-- **Lenguaje**: Java 21  
-- **Gestión de Dependencias**: Maven
+## Autenticación y Seguridad
+
+El sistema utiliza un mecanismo de autenticación basado en JWT. MS-Auth genera tokens al iniciar sesión, que luego son validados por otros microservicios al procesar solicitudes. [13](#3-12) 
+
+### TokenContext Pattern [14](#3-13) 
+
+## Contexto de Negocio Chileno y Validación de RUT
+
+El sistema está específicamente diseñado para el mercado chileno, con MS-Proveedores
+
